@@ -1,7 +1,13 @@
 const express = require ('express')
+const ProductManager = require ('./ProductManager')
+
+const manager = new ProductManager()
+
+console.log(manager)
 
 const app = express()
 
+app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
