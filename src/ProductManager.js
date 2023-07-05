@@ -73,7 +73,6 @@ class ProductManager {
 }
 
 const manager = new ProductManager()
-
-manager.getProducts()
+console.log(manager)
 
 module.exports = ProductManager
