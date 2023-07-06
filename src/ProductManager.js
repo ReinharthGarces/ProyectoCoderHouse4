@@ -1,4 +1,4 @@
-// //Desafio entregable 3
+//Primera Pre-Entrega
 const fs = require('fs')
 
 class ProductManager {
@@ -73,6 +73,6 @@ class ProductManager {
 }
 
 const manager = new ProductManager()
-console.log(manager)
+
 
 module.exports = ProductManager
