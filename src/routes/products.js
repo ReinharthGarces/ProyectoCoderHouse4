@@ -1,7 +1,8 @@
 const { Router } = require('express')
+const fs = require ('fs')
 const ProductManager = require('../ProductManager')
 const productsRouter = Router()
-const manager = new ProductManager('../products.json')
+const manager = new ProductManager('./products.json')
 let products = []
 
 
@@ -49,17 +50,18 @@ productsRouter.get('/:pid', async (req, res) => {
 
 
 //Metodo POST
-productsRouter.post('/', (req, res) => {
+productsRouter.post('/', async (req, res) => {
   const product = req.body
-
   if(!product || Object.values(product).some(value => !value)){
-    return res.status(400).send({status: "error", error: "Incomplete values"})
+    return res.status(400).json({status: "error", error: "Incomplete values"})
   }
 
-  product.id = products.length + 1
-  products.push(product)
-  console.log(products)
-  return res.status(201).json({status: "success",  message:"Product created" })
+  try {
+    await manager.addProduct(product.title, product.description, product.code, product.price, product.status, product.stock, product.thumbnail)
+    return res.status(201).json({ status: "success", message: "Product created" }) , console.log(product)
+  } catch (error) {
+    return res.status(500).json({ status: "error", error: "Failed to create product" })
+  }
 })
 
 
@@ -106,5 +108,5 @@ productsRouter.delete('/:pid', async (req, res) => {
   return res.status(204).json({})
 })
 
-
+//ejecutar con nodemon --ignore products.json app.js
 module.exports = productsRouter
