@@ -58,6 +58,7 @@ productsRouter.post('/', async (req, res) => {
 
   try {
     await manager.addProduct(product.title, product.description, product.code, product.price, product.status, product.stock, product.thumbnail)
+    manager.writeProductsToFile()
     return res.status(201).json({ status: "success", message: "Product created" }) , console.log(product)
   } catch (error) {
     return res.status(500).json({ status: "error", error: "Failed to create product" })
@@ -88,6 +89,7 @@ productsRouter.put('/:pid', async (req, res) => {
   product.stock = data.stock || product.stock
   product.thumbnail = data.thumbnail || product.thumbnail
 
+  manager.updateProduct(product, data)
   return res.json(product)
 })
 
@@ -95,16 +97,8 @@ productsRouter.put('/:pid', async (req, res) => {
 //Metodo DELETE
 productsRouter.delete('/:pid', async (req, res) => {
   const productId = parseInt(req.params.pid)
-  const products = await manager.getProducts() 
-  const productIndex = products.findIndex(productIndex => productIndex.id === productId)
+  manager.deleteProduct(productId)
 
-  if (productIndex === -1) {
-    return res.status(404).json({
-      error: 'Product not found'
-    })
-  }
-
-  products.splice(productIndex, 1)
   return res.status(204).json({})
 })
 

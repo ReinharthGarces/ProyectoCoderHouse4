@@ -44,13 +44,23 @@ class ProductManager {
   }
 
   writeProductsToFile() {
-    fs.writeFile(this.path, JSON.stringify(this.products, null, 2) , (err) => {
-      if (err) {
-        console.error('Error al escribir en el archivo:', err);
-      } else {
-        console.log('Productos escritos en el archivo correctamente');
-      }
-    });
+    fs.promises.readFile(this.path, 'utf-8')
+      .then((data) => {
+        const products = JSON.parse(data)
+        if (!products.length) {
+          this.productIdCounter+1
+        } else {
+          products.push(...this.products)
+        }
+        
+        return fs.promises.writeFile(this.path, JSON.stringify(products, null, 2))
+      })
+      .then(() => {
+        console.log('Productos escritos en el archivo correctamente')
+      })
+      .catch((err) => {
+        console.error('Error al escribir en el archivo:', err)
+      });
   }
 
 
@@ -93,13 +103,13 @@ class ProductManager {
   updateProduct(id, updatedFields) {
     fs.promises.readFile(this.path, 'utf-8')
       .then((data) => {
-        const productsJson = JSON.parse(data);
+        const productsJson = JSON.parse(data)
         const productIndex = productsJson.findIndex((product) => product.id === id)
   
         if (!productIndex) {
           const error = 'Producto en updateProduct no encontrado'
-          console.log(error);
-          return error;
+          console.log(error)
+          return error
         }
   
         const updatedProduct = { ...productsJson[productIndex], ...updatedFields }
@@ -109,8 +119,7 @@ class ProductManager {
       })
       .then((updatedProduct) => {
         console.log('Producto actualizado con éxito')
-        console.log(updatedProduct)
-        return 
+        return console.log(updatedProduct)
       })
       .catch((err) => {
         console.log('ERROR: No se pudo actualizar el producto')
@@ -118,17 +127,18 @@ class ProductManager {
       });
   }
   
+
 //Creo metodo deleteProduct
   deleteProduct(id) {
     fs.promises.readFile(this.path, 'utf-8')
       .then((data) => {
         const productsJson = JSON.parse(data);
-        const productIndex = productsJson.findIndex((product) => product.id === id);
+        const productIndex = productsJson.findIndex((product) => product.id === id)
   
         if (productIndex === -1) {
-          const error = 'Producto en deleteProduct no encontrado';
-          console.log(error);
-          return error;
+          const error = 'Producto en deleteProduct no encontrado'
+          console.log(error)
+          return error
         }
   
         const deleteProduct = productsJson.splice(productIndex, 1)
@@ -136,17 +146,15 @@ class ProductManager {
         return fs.promises.writeFile(this.path, JSON.stringify(productsJson, null, 2)) , deleteProduct
       })
       .then((deleteProduct) => {
-        console.log('Producto en deleteProduct eliminado con éxito');
+        console.log('Producto en deleteProduct eliminado con éxito')
         console.log(deleteProduct)
       })
       .catch((err) => {
-        console.log('ERROR: No se pudo eliminar el producto');
-        return err;
+        console.log('ERROR: No se pudo eliminar el producto')
+        return err
       });
   }
 }
 
 const manager = new ProductManager()
-
-
 module.exports = ProductManager
