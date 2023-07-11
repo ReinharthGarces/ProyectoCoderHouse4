@@ -1,4 +1,19 @@
-{
-  "id": "7959fc5d-5c48-4f04-84f0-80ba9bbd3f64",
-  "products": []
-}
+[
+  {
+    "cartId": 1,
+    "products": []
+  },
+  {
+    "cartId": 2,
+    "products": [
+      {
+        "id": 3,
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "cartId": 3,
+    "products": []
+  }
+]

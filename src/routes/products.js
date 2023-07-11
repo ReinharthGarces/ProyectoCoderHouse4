@@ -6,8 +6,6 @@ const manager = new ProductManager('./products.json')
 let products = []
 
 
-
-
 //Probando Middleware
 productsRouter.use((req,res,next) =>{
   console.log('Middleware en productsRouter')
@@ -15,7 +13,7 @@ productsRouter.use((req,res,next) =>{
 })
 
 
-//Metodos GET
+//Metodo GET
 productsRouter.get('/', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit)
@@ -34,6 +32,7 @@ productsRouter.get('/', async (req, res) => {
   }
 })
 
+//Metodo GET/:pid 
 productsRouter.get('/:pid', async (req, res) => {
   try {
     const productId = parseInt(req.params.pid)
