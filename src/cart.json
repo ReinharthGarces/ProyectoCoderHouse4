@@ -5,12 +5,7 @@
   },
   {
     "cartId": 2,
-    "products": [
-      {
-        "id": 3,
-        "quantity": 1
-      }
-    ]
+    "products": []
   },
   {
     "cartId": 3,

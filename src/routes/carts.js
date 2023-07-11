@@ -26,12 +26,12 @@ cartsRouter.post('/', (req, res) => {
 
   fs.promises.writeFile('./cart.json', JSON.stringify(carts, null, 2))
     .then(() => {
-      console.log('El carrito se ha guardado correctamente');
-      res.status(201).json(newCart);
+      console.log('El carrito se ha guardado correctamente')
+      res.status(201).json(newCart)
   })
     .catch(() => {
-      console.log('Error al escribir en el archivo:');
-      res.status(500).json({ error: 'Error al guardar el carrito' });
+      console.log('Error al escribir en el archivo:')
+      res.status(500).json({ error: 'Error al guardar el carrito' })
   });
 });
 
