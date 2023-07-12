@@ -2,7 +2,7 @@ const { Router } = require('express')
 const fs = require ('fs')
 const ProductManager = require('../ProductManager')
 const productsRouter = Router()
-const manager = new ProductManager('./products.json')
+const manager = new ProductManager('./src/products.json')
 let products = []
 
 
@@ -57,7 +57,7 @@ productsRouter.post('/', async (req, res) => {
 
   try {
     await manager.addProduct(product.title, product.description, product.code, product.price, product.status, product.stock, product.thumbnail)
-    manager.writeProductsToFile()
+    // manager.writeProductsToFile()
     return res.status(201).json({ status: "success", message: "Product created" }) , console.log(product)
   } catch (error) {
     return res.status(500).json({ status: "error", error: "Failed to create product" })
@@ -79,16 +79,15 @@ productsRouter.put('/:pid', async (req, res) => {
     })
   }
 
-  product.id = product.id
   product.title = data.title || product.title
   product.description = data.description || product.description
   product.code = data.code || product.code
   product.price = data.price || product.price
   product.status = data.status || product.status
   product.stock = data.stock || product.stock
-  product.thumbnail = data.thumbnail || product.thumbnail
 
-  manager.updateProduct(product, data)
+
+  manager.updateProduct(product.id, data)
   return res.json(product)
 })
 

@@ -3,7 +3,7 @@ const fs = require('fs')
 
 const cartsRouter = Router()
 const ProductManager = require('../ProductManager')
-const manager = new ProductManager('./products.json.')
+const manager = new ProductManager('./src/products.json')
 let carts = []
 let newCartId = 1
 

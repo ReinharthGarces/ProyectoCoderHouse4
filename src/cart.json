@@ -10,5 +10,9 @@
   {
     "cartId": 3,
     "products": []
+  },
+  {
+    "cartId": 4,
+    "products": []
   }
 ]

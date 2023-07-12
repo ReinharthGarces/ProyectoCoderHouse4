@@ -28,15 +28,5 @@
     "status": true,
     "stock": 20,
     "thumbnail": "auricularesProducto3.jpg"
-  },
-  {
-    "id": 4,
-    "title": "Monitor",
-    "description": "Producto 4",
-    "code": "CODE4",
-    "price": 40,
-    "status": true,
-    "stock": 25,
-    "thumbnail": "monitorProducto4.jpg"
   }
 ]

@@ -39,10 +39,10 @@ class ProductManager {
     this.products.push(product)
     this.productIdCounter++
     this.writeProductsToFile()
-
     return product
   }
 
+//WriteFiles
   writeProductsToFile() {
     fs.promises.readFile(this.path, 'utf-8')
       .then((data) => {
@@ -106,7 +106,7 @@ class ProductManager {
         const productsJson = JSON.parse(data)
         const productIndex = productsJson.findIndex((product) => product.id === id)
   
-        if (!productIndex) {
+        if (productIndex === -1) {
           const error = 'Producto en updateProduct no encontrado'
           console.log(error)
           return error
@@ -127,7 +127,6 @@ class ProductManager {
       });
   }
   
-
 //Creo metodo deleteProduct
   deleteProduct(id) {
     fs.promises.readFile(this.path, 'utf-8')
