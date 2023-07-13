@@ -1,11 +1,9 @@
 const { Router } = require('express')
 const fs = require('fs')
-
 const cartsRouter = Router()
-const ProductManager = require('../ProductManager')
-const manager = new ProductManager('./src/products.json')
-let carts = []
-let newCartId = 1
+const CartManager = require('../cartManager')
+const manager = new CartManager('./src/cart.json')
+
 
 //Probando Middleware 
 cartsRouter.use((req,res,next) =>{
@@ -15,24 +13,24 @@ cartsRouter.use((req,res,next) =>{
 
 
 //Metodo POST
-cartsRouter.post('/', (req, res) => {
-  const newCart = {
-    cartId: newCartId,
-    products: [],
-  };
+cartsRouter.post('/', async (req, res) => {
+  // const newCart = {
+  //   cartId: newCartId,
+  //   products: [],
+  // };
 
-  carts.push(newCart)
-  newCartId++
+  // carts.push(newCart)
+  // newCartId++
 
-  fs.promises.writeFile('./cart.json', JSON.stringify(carts, null, 2))
-    .then(() => {
-      console.log('El carrito se ha guardado correctamente')
-      res.status(201).json(newCart)
-  })
-    .catch(() => {
-      console.log('Error al escribir en el archivo:')
-      res.status(500).json({ error: 'Error al guardar el carrito' })
-  });
+  // fs.promises.writeFile('./src/cart.json', JSON.stringify(carts, null, 2))
+  //   .then(() => {
+  //     console.log('El carrito se ha guardado correctamente')
+  //     res.status(201).json(newCart)
+  // })
+  //   .catch(() => {
+  //     console.log('Error al escribir en el archivo:')
+  //     res.status(500).json({ error: 'Error al guardar el carrito' })
+  // });
 });
 
 //Metodo GET/:cid

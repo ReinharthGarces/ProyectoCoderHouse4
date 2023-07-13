@@ -8,13 +8,15 @@ class ProductManager {
     this.path = path
   }
 
-  addProduct( title, description, code, price, status, stock, thumbnail ) {
+  async addProduct( title, description, code, price, status, stock, thumbnail ) {
     // Validando que todos los campos sean obligatorios
     if (!title || !description || !code || !price ||  !status || !stock || !thumbnail ) {
       const error = 'Error: Todos los campos son obligatorios'
       console.log(error)
       return error
     }
+
+    const products = await this.getProducts()
 
     // Validando si el campo "code" ya está en uso
     const existingProduct = this.products.findIndex((product) => product.code === code)
@@ -26,7 +28,7 @@ class ProductManager {
     }
 
     const product = {
-      id: this.productIdCounter,
+      id: products?.length+1,
       title: title,
       description: description,
       code: code,
@@ -37,7 +39,6 @@ class ProductManager {
     };
 
     this.products.push(product)
-    this.productIdCounter++
     this.writeProductsToFile()
     return product
   }
@@ -115,11 +116,11 @@ class ProductManager {
         const updatedProduct = { ...productsJson[productIndex], ...updatedFields }
         productsJson[productIndex] = updatedProduct
 
-        return updatedProduct
+        return this.saveProducts(productsJson)
       })
-      .then((updatedProduct) => {
+      .then(() => {
         console.log('Producto actualizado con éxito')
-        return console.log(updatedProduct)
+        return 
       })
       .catch((err) => {
         console.log('ERROR: No se pudo actualizar el producto')
@@ -127,6 +128,11 @@ class ProductManager {
       });
   }
   
+  async saveProducts(products) {
+    const productsJson = await JSON.stringify(products, null, 2)
+    return fs.promises.writeFile(this.path, productsJson, "utf-8" )
+  }
+
 //Creo metodo deleteProduct
   deleteProduct(id) {
     fs.promises.readFile(this.path, 'utf-8')
