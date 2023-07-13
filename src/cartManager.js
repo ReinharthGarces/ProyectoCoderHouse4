@@ -4,42 +4,32 @@ const fs = require('fs')
 class CartManager {
   constructor(path) {
     this.carts = []
-    this.catsId = 1
+    this.cartId = 1
     this.path = path
   }
 
-  async createCart( products ) {
-    const cart = {
-      id: carts?.length+1,
-      products: products
-    }
-
+//Creo metodo createCarts
+  async createCart() {
     const carts = await this.getCarts()
-    
-    this.carts.push()
+    const cart = {
+      cid: carts?.length+1,
+      products: []
+    };
+  
+    this.carts.push(cart);
     this.writeCartsToFile()
     return cart
   }
 
   writeCartsToFile() {
-    fs.promises.readFile(this.path, 'utf-8')
-    .then((data) => {
-      const carts = JSON.parse(data)
-      if (!carts.length) {
-        this.cartsId+1
-      } else {
-        carts.push(...this.carts)
-      }
-      return fs.promises.writeFile(this.path, JSON.stringify(carts, null, 2))
-  })
+    fs.promises.writeFile(this.path, JSON.stringify(this.carts, null, 2))
     .then(() => {
-      console.log('El carrito se ha guardado correctamente')
-  })
+      console.log('writeCartsToFile con éxito');
+    })
     .catch((err) => {
-      console.log('Error al escribir en el archivo:', err)
-  });
-  }
-
+      console.log('writeCartsToFile error:', err);
+    });
+}
 //Creo metodo getCarts
   async getCarts() {
     try {
@@ -52,6 +42,29 @@ class CartManager {
       throw error
     }
   }
+
+//Creo metodo getProductsById
+async getCartsById(cid) {
+  try {
+    const data = await fs.promises.readFile(this.path, 'utf-8')
+    const cartsJson = JSON.parse(data)
+    const cart = cartsJson.find((cart) => cart.cid === cid)
+
+    if (!cart.cid) {
+      const error = 'cart en getCartsById no encontrado'
+      console.log(error)
+      return error
+    }
+
+    console.log('cart en getCartsById encontrado:', cart)
+    return cart
+  } catch (error) {
+    console.log('ERROR: Archivo en getCartsById no leído')
+    throw error
+  }
+}
+
+
 }
 
 const manager = new CartManager()

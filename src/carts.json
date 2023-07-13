@@ -1,14 +1,14 @@
 [
   {
-    "cartId": 1,
+    "cid": 1,
     "products": []
   },
   {
-    "cartId": 2,
+    "cid": 2,
     "products": []
   },
   {
-    "cartId": 3,
+    "cid": 3,
     "products": []
   }
 ]

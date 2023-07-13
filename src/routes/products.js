@@ -36,10 +36,10 @@ productsRouter.get('/:pid', async (req, res) => {
   try {
     const productId = parseInt(req.params.pid)
     const product = await manager.getProductsById(productId)
-    if (!product) {
+    if (!product.pid) {
       return res.status(404).json({ error: 'Producto no encontrado' })
     }
-    res.json(product)
+    res.status(200).json(product)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error al obtener el producto' })
@@ -56,7 +56,10 @@ productsRouter.post('/', async (req, res) => {
 
   try {
     manager.addProduct(product.title, product.description, product.code, product.price, product.status, product.stock, product.thumbnail)
-    return res.status(201).json({ status: "success", message: "Product created" }) , console.log(product)
+    if (typeof result === "string") {
+      return res.status(400).json({ status: "error", error: result });
+    }
+    return res.status(201).json({ status: "success", message: "Product created" }) 
   } catch (error) {
     return res.status(500).json({ status: "error", error: "Failed to create product" })
   }

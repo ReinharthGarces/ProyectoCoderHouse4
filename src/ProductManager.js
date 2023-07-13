@@ -86,12 +86,6 @@ class ProductManager {
       const productsJson = JSON.parse(data)
       const product = productsJson.find((product) => product.id === id)
 
-      if (!product) {
-        const error = 'Producto en getProductsById no encontrado'
-        console.log(error)
-        return error
-      }
-
       console.log('Producto en getProductsById encontrado:', product)
       return product
     } catch (error) {
