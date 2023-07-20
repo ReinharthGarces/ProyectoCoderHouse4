@@ -16,7 +16,8 @@ class CartManager {
       products: []
     };
   
-    this.carts.push(cart);
+    carts.push(cart)
+    this.carts = carts
     this.writeCartsToFile()
     return cart
   }

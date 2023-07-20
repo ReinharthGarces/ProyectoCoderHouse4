@@ -1,8 +1,8 @@
 const { Router } = require('express')
 const fs = require ('fs')
-const ProductManager = require('../ProductManager')
 const productsRouter = Router()
-const manager = new ProductManager('./src/products.json')
+const ProductManager = require('../manager/ProductManager')
+const manager = new ProductManager('./src/json/products.json')
 
 
 //Probando Middleware
@@ -36,7 +36,7 @@ productsRouter.get('/:pid', async (req, res) => {
   try {
     const productId = parseInt(req.params.pid)
     const product = await manager.getProductsById(productId)
-    if (!product.pid) {
+    if (!product) {
       return res.status(404).json({ error: 'Producto no encontrado' })
     }
     res.status(200).json(product)
