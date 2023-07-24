@@ -1,21 +1,37 @@
+{{!-- Formulario --}}
+<form action="/realTimeProducts" method="POST">
+  <label for="name"><strong>Name: </strong><input id="nameInput" type="text" name="name"></label>
+  <label for="description"><strong>Description: </strong><input id="descriptionInput" type="text" name="description"></label>
+  <label for="code"><strong>Code: </strong><input id="codeInput" type="text" name="code"></label>
+  <label for="price"><strong>Price: </strong><input id="priceInput" type="text" name="price"></label>
+  <label for="stock"><strong>Stock: </strong><input id="stockInput" type="text" name="stock"></label>
+  <label for="thumbnail"><strong>Thumbnail: </strong><input id="thumbnailInput" type="text" name="thumbnail"></label>
+  <input class="sendButton" id="sendButton" type="submit" value="Send">
+</form>
+
+{{!-- Tabla de productos --}}
 <table id="productos">
   <tr>
     <th>Id:</th>
-    <th>Title:</th>
+    <th>Name:</th>
     <th>Description:</th>
     <th>Code:</th>
     <th>Price:</th>
     <th>Stock:</th>
+    <th>Thumbnail:</th>
   </tr>
   {{#each products}}
     <tr>
       <td>{{this.id}}</td>
-      <td>{{this.title}}</td>
+      <td>{{this.name}}</td>
       <td>{{this.description}}</td>
       <td>{{this.code}}</td>
       <td>{{this.price}}</td>
       <td>{{this.stock}}</td>
-      <td><button class="deleteButton" id="deleteButton_{{this.id}}" onclick="deleteProduct({{this.id}})">Borrar</button></td>
+      <td>{{this.thumbnail}}</td>
+      <td>
+        <button class="deleteButton" id="{{this.id}}" type="submit" action="/realTimeProducts" method="DELETE">Delete</button>
+      </td>
     </tr>
   {{/each}}
   

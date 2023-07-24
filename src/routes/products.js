@@ -55,7 +55,7 @@ productsRouter.post('/', async (req, res) => {
   }
 
   try {
-    manager.addProduct(product.title, product.description, product.code, product.price, product.status, product.stock, product.thumbnail)
+    manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });
     }
@@ -81,17 +81,15 @@ productsRouter.put('/:pid', async (req, res) => {
   }
 
   product.id = product.id
-  product.title = data.title || product.title
+  product.name = data.name || product.name
   product.description = data.description || product.description
   product.code = data.code || product.code
   product.price = data.price || product.price
-  product.status = data.status || product.status
   product.stock = data.stock || product.stock
   product.thumbnail = data.thumbnail || product.thumbnail
 
 
   manager.updateProduct(product.id, data)
-  // manager.saveProducts(products)
   return res.json(product)
 })
 
@@ -104,5 +102,4 @@ productsRouter.delete('/:pid', async (req, res) => {
   return res.status(204).json({})
 })
 
-//ejecutar con nodemon --ignore cart.json, products.json app.js
 module.exports = productsRouter

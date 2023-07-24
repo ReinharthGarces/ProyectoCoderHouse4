@@ -8,9 +8,9 @@ class ProductManager {
     this.path = path
   }
 
-  async addProduct( title, description, code, price, status, stock, thumbnail ) {
+  async addProduct( name, description, code, price, stock, thumbnail ) {
     // Validando que todos los campos sean obligatorios
-    if (!title || !description || !code || !price ||  !status || !stock || !thumbnail ) {
+    if (!name || !description || !code || !price || !stock || !thumbnail ) {
       const error = 'Error: Todos los campos son obligatorios'
       console.log(error)
       return error
@@ -29,11 +29,10 @@ class ProductManager {
 
     const product = {
       id: products?.length+1,
-      title: title,
+      name: name,
       description: description,
       code: code,
       price: price,
-      status: status,
       stock: stock,
       thumbnail: thumbnail,
     };

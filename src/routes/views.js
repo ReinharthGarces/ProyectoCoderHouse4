@@ -1,4 +1,5 @@
 const { Router } = require('express')
+const socketServer = require('../utils/io')
 const fs = require ('fs')
 const viewsRouter = Router()
 const ProductManager = require('../manager/ProductManager')
@@ -12,10 +13,39 @@ viewsRouter.get('/home', async (req,res) => {
 })
 
 //Vista realTimeProducts.Handlebars
-  viewsRouter.get('/realtimeproducts', async (req,res) => {
-    const products =  await manager.getProducts()
+viewsRouter.get('/realtimeproducts', async (req,res) => {
+  const products =  await manager.getProducts()
   return res.render('realTimeProducts', { title: 'ReinharthApp-Products', style: 'realTimeProducts.css', products })
 })
 
+//Metodo POST realTimeProducts.Handlebars 
+viewsRouter.post('/realtimeproducts', async (req,res) => {
+  const products =  await manager.getProducts()
+  const product = req.body
+
+  if(!product || Object.values(product).some(value => !value)){
+    return res.status(400).json({status: "error", error: "Incomplete values"})
+  }
+
+  try {
+    manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
+    if (typeof result === "string") {
+      return res.status(400).json({ status: "error", error: result });
+    }
+    // socketServer.emit('nuevoProducto', JSON.stringify(product))
+    return res.redirect('/realTimeProducts')
+  } catch (error) {
+    return res.status(500).json({ status: "error", error: "Failed to create product" })
+  }
+})
+
+//Metodo DELETE realTimeProducts.Handlebars 
+// viewsRouter.delete('/realtimeproducts', async (req, res) => {
+//   const productId = parseInt(req.params.pid)
+//   console.log(productId)
+//   manager.deleteProduct(productId)
+
+//   return res.status(204).json({})
+// })
 
 module.exports = viewsRouter

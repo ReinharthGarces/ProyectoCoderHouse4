@@ -1,15 +1,17 @@
 const { Server } = require('socket.io')
+// const ProductManager = require('../manager/ProductManager')
+// const manager = new ProductManager('./src/json/products.json')
 
 const init = (httpServer) =>{
   const io = new Server(httpServer)
 
   io.on('connection', (socket) => {
-  console.log('Nuevo cliente conectado!', socket.id)
-  socket.on('Mi mensaje', (data) =>{
-    console.log(data)
+    console.log('Nuevo cliente conectado!', socket.id)
+    socket.on('Mi mensaje', (data) =>{
+      console.log(data)
+    })
+    socket.emit('Mensaje Back-end', 'Mensaje enviado desde Back-end')
   })
-  socket.emit('Mensaje Back-end', 'Mensaje enviado desde Back-end')
-})
   return io
 }
 module.exports = init
