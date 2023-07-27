@@ -1,4 +1,3 @@
-//Primera Pre-Entrega
 const fs = require('fs')
 
 class ProductManager {
@@ -9,13 +8,6 @@ class ProductManager {
   }
 
   async addProduct( name, description, code, price, stock, thumbnail ) {
-    // Validando que todos los campos sean obligatorios
-    if (!name || !description || !code || !price || !stock || !thumbnail ) {
-      const error = 'Error: Todos los campos son obligatorios'
-      console.log(error)
-      return error
-    }
-
     const products = await this.getProducts()
 
     // Validando si el campo "code" ya está en uso

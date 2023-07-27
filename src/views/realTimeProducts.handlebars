@@ -1,5 +1,5 @@
 {{!-- Formulario --}}
-<form action="/realTimeProducts" method="POST">
+<form id="productForm" action="/realTimeProducts" method="POST">
   <label for="name"><strong>Name: </strong><input id="nameInput" type="text" name="name"></label>
   <label for="description"><strong>Description: </strong><input id="descriptionInput" type="text" name="description"></label>
   <label for="code"><strong>Code: </strong><input id="codeInput" type="text" name="code"></label>
@@ -30,7 +30,7 @@
       <td>{{this.stock}}</td>
       <td>{{this.thumbnail}}</td>
       <td>
-        <button class="deleteButton" id="{{this.id}}" type="submit" action="/realTimeProducts" method="DELETE">Delete</button>
+        <button class="deleteButton" id="deleteButton_{{this.id}}">Delete</button>
       </td>
     </tr>
   {{/each}}

@@ -6,6 +6,7 @@ const ProductManager = require('../manager/ProductManager')
 const manager = new ProductManager('./src/json/products.json')
 
 
+
 //Vista home.handlebars
 viewsRouter.get('/home', async (req,res) => {
   const products =  await manager.getProducts()
@@ -20,32 +21,24 @@ viewsRouter.get('/realtimeproducts', async (req,res) => {
 
 //Metodo POST realTimeProducts.Handlebars 
 viewsRouter.post('/realtimeproducts', async (req,res) => {
-  const products =  await manager.getProducts()
   const product = req.body
 
-  if(!product || Object.values(product).some(value => !value)){
+  if(!product.name || !product.description || !product.code || !product.price || !product.stock || !product.thumbnail){
     return res.status(400).json({status: "error", error: "Incomplete values"})
   }
 
   try {
+    const products = await manager.getProducts()
     manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });
     }
-    // socketServer.emit('nuevoProducto', JSON.stringify(product))
+    // Emitir el evento 'nuevoProducto' con los datos del nuevo producto
+    io.emit('nuevoProducto', product)
     return res.redirect('/realTimeProducts')
   } catch (error) {
     return res.status(500).json({ status: "error", error: "Failed to create product" })
   }
 })
-
-//Metodo DELETE realTimeProducts.Handlebars 
-// viewsRouter.delete('/realtimeproducts', async (req, res) => {
-//   const productId = parseInt(req.params.pid)
-//   console.log(productId)
-//   manager.deleteProduct(productId)
-
-//   return res.status(204).json({})
-// })
 
 module.exports = viewsRouter

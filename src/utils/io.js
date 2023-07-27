@@ -1,6 +1,4 @@
 const { Server } = require('socket.io')
-// const ProductManager = require('../manager/ProductManager')
-// const manager = new ProductManager('./src/json/products.json')
 
 const init = (httpServer) =>{
   const io = new Server(httpServer)
@@ -14,4 +12,4 @@ const init = (httpServer) =>{
   })
   return io
 }
-module.exports = init
+module.exports = { init }
