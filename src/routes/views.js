@@ -1,6 +1,5 @@
 const { Router } = require('express')
-const socketServer = require('../utils/io')
-const fs = require ('fs')
+
 const viewsRouter = Router()
 const ProductManager = require('../manager/ProductManager')
 const manager = new ProductManager('./src/json/products.json')
