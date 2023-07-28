@@ -34,7 +34,7 @@ viewsRouter.post('/realtimeproducts', async (req,res) => {
       return res.status(400).json({ status: "error", error: result });
     }
     // Emitir el evento 'nuevoProducto' con los datos del nuevo producto
-    io.emit('nuevoProducto', product)
+    // io.emit('nuevoProducto', product)
     return res.redirect('/realTimeProducts')
   } catch (error) {
     return res.status(500).json({ status: "error", error: "Failed to create product" })

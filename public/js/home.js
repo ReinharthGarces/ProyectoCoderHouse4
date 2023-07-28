@@ -18,4 +18,4 @@ socket.on('nuevoProducto', (product) => {
     <td><button class="deleteButton" id="deleteButton_${product.id}" onclick="deleteProduct(${product.id})">Borrar</button></td>
   `;
   tableBody.appendChild(newRow);
-});
+})
