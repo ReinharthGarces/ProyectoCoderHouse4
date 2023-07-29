@@ -49,21 +49,26 @@ productsRouter.get('/:pid', async (req, res) => {
 
 //Metodo POST
 productsRouter.post('/', async (req, res) => {
-  const product = req.body
-  if(!product || Object.values(product).some(value => !value)){
-    return res.status(400).json({status: "error", error: "Incomplete values"})
+  const product = req.body;
+  if (!product || Object.values(product).some(value => !value)) {
+    return res.status(400).json({ status: "error", error: "Incomplete values" });
   }
 
   try {
-    manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
+    // Aquí se agrega el producto al archivo JSON utilizando el objeto manager
+    const result = await manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail); 
     if (typeof result === "string") {
+      console.error("Error al agregar el producto:", result); // Agregamos un mensaje de error adicional
       return res.status(400).json({ status: "error", error: result });
     }
-    return res.status(201).json({ status: "success", message: "Product created" }) 
+
+    return res.status(201).json({ status: "success", message: "Product created" });
   } catch (error) {
-    return res.status(500).json({ status: "error", error: "Failed to create product" })
+    console.error("Error al agregar el producto:", error); // Agregamos un mensaje de error adicional
+    return res.status(500).json({ status: "error", error: "Failed to create product" });
   }
-})
+});
+
 
 
 //Metodo PUT

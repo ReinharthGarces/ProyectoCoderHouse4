@@ -1,6 +1,5 @@
 const { Router } = require('express')
-const socketServer = require('../utils/io')
-const fs = require ('fs')
+
 const viewsRouter = Router()
 const ProductManager = require('../manager/ProductManager')
 const manager = new ProductManager('./src/json/products.json')
@@ -26,15 +25,12 @@ viewsRouter.post('/realtimeproducts', async (req,res) => {
   if(!product.name || !product.description || !product.code || !product.price || !product.stock || !product.thumbnail){
     return res.status(400).json({status: "error", error: "Incomplete values"})
   }
-
   try {
     const products = await manager.getProducts()
     manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });
     }
-    // Emitir el evento 'nuevoProducto' con los datos del nuevo producto
-    // io.emit('nuevoProducto', product)
     return res.redirect('/realTimeProducts')
   } catch (error) {
     return res.status(500).json({ status: "error", error: "Failed to create product" })

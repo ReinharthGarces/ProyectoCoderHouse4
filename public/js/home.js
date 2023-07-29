@@ -15,7 +15,23 @@ socket.on('nuevoProducto', (product) => {
     <td>${product.code}</td>
     <td>${product.price}</td>
     <td>${product.stock}</td>
-    <td><button class="deleteButton" id="deleteButton_${product.id}" onclick="deleteProduct(${product.id})">Borrar</button></td>
   `;
   tableBody.appendChild(newRow);
 })
+
+// Agregar el evento para eliminar producto
+socket.on('eliminarProducto', (productId) => {
+  const tableBody = document.querySelector("#productos")
+  const rows = tableBody.getElementsByTagName("tr")
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]
+    const idCell = row.getElementsByTagName("td")[0]
+    const id = idCell.textContent
+
+    if (id === productId) {
+      tableBody.removeChild(row)
+      break
+    }
+  }
+});
