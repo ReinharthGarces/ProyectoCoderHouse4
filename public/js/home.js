@@ -5,7 +5,7 @@ const socket = io();
 
 // Escuchar el evento 'nuevoProducto'
 socket.on('nuevoProducto', (product) => {
-  // Agregar el nuevo producto a la tabla de productos en la página "home"
+// Agregar el nuevo producto a la tabla de productos en la página "home"
   const tableBody = document.querySelector("#productos");
   const newRow = document.createElement("tr");
   newRow.innerHTML = `
