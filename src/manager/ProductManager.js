@@ -55,7 +55,6 @@ class ProductManager {
       });
   }
 
-
 //Creo metodo getProducts
   async getProducts() {
     try {

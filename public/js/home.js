@@ -1,5 +1,3 @@
-console.log('Test home.js')
-
 // Conectar al servidor Socket.IO
 const socket = io();
 

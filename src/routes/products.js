@@ -4,13 +4,11 @@ const productsRouter = Router()
 const ProductManager = require('../manager/ProductManager')
 const manager = new ProductManager('./src/json/products.json')
 
-
 //Probando Middleware
 productsRouter.use((req,res,next) =>{
   console.log('Middleware en productsRouter')
   return next()
 })
-
 
 //Metodo GET
 productsRouter.get('/', async (req, res) => {
@@ -46,7 +44,6 @@ productsRouter.get('/:pid', async (req, res) => {
   }
 })
 
-
 //Metodo POST
 productsRouter.post('/', async (req, res) => {
   const product = req.body;
@@ -68,8 +65,6 @@ productsRouter.post('/', async (req, res) => {
     return res.status(500).json({ status: "error", error: "Failed to create product" });
   }
 });
-
-
 
 //Metodo PUT
 productsRouter.put('/:pid', async (req, res) => {
@@ -93,11 +88,9 @@ productsRouter.put('/:pid', async (req, res) => {
   product.stock = data.stock || product.stock
   product.thumbnail = data.thumbnail || product.thumbnail
 
-
   manager.updateProduct(product.id, data)
   return res.json(product)
 })
-
 
 //Metodo DELETE
 productsRouter.delete('/:pid', async (req, res) => {

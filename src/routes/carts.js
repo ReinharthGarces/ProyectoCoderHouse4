@@ -4,13 +4,11 @@ const cartsRouter = Router()
 const CartManager = require('../manager/cartManager')
 const manager = new CartManager('./src/json/carts.json')
 
-
 //Probando Middleware 
 cartsRouter.use((req,res,next) =>{
   console.log('Middleware en cartsRouter')
   return next()
 })
-
 
 //Metodo POST
 cartsRouter.post('/', async (req, res) => {
@@ -24,7 +22,6 @@ cartsRouter.post('/', async (req, res) => {
   }
 })
 
-
 //Metodo GET/:cid
 cartsRouter.get('/:cid', async (req, res) => {
   try {
@@ -37,7 +34,6 @@ cartsRouter.get('/:cid', async (req, res) => {
     return res.status(500).json({ error: 'Error al obtener el carrito' })
   }
 })
-
 
 //Metodo POST/:cid/product/:pid
 cartsRouter.post('/:cid/product/:pid', async (req, res) => {
@@ -66,6 +62,5 @@ cartsRouter.post('/:cid/product/:pid', async (req, res) => {
     return res.status(500).json({ error: 'Error al guardar los datos del carrito' })
   }
 })
-
 
 module.exports = cartsRouter
