@@ -13,7 +13,7 @@ const stockInput = document.getElementById("stockInput");
 const thumbnailInput = document.getElementById("thumbnailInput");
 
 const sendFormToServer = (event) => {
-  event.preventDefault();
+  // event.preventDefault();
 
   fetch('/api/products')
     .then((response) => response.json())
@@ -58,6 +58,7 @@ const sendFormToServer = (event) => {
 form.addEventListener("submit", sendFormToServer);
 
 socket.on("nuevoProducto", (product) => {
+  console.log('Nuevo producto recibido en el servidor:', product)
   const tableBody = document.querySelector("#productos");
   const newRow = document.createElement("tr");
   newRow.innerHTML = `
@@ -98,7 +99,5 @@ document.addEventListener("click", (event) => {
     const productId = event.target.id.split("_")[1]
     deleteProduct(productId)
   }
-  // } return socket.on("productoEliminado", (id) => {
-  //     console.log(id, 'productoEliminado')
-  // })
+
 });

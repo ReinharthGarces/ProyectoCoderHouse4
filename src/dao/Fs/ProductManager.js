@@ -14,10 +14,14 @@ class ProductManager {
     const existingProduct = this.products.findIndex((product) => product.code === code)
 
     if (existingProduct !== -1) {
+      try{
       const error = 'Error: Ya existe un producto con ese código'
       console.log(error)
       return error
+    }catch (error){
+      throw error
     }
+  }
 
     const product = {
       id: products?.length+1,

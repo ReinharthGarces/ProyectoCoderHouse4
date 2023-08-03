@@ -64,8 +64,6 @@ async getCartsById(cid) {
     throw error
   }
 }
-
-
 }
 
 const manager = new CartManager()

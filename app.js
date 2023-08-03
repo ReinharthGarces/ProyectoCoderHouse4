@@ -6,7 +6,7 @@ const handlebars = require('express-handlebars');
 const productsRouter = require('./src/routes/products');
 const cartsRouter = require('./src/routes/carts');
 const viewsRouter = require('./src/routes/views');
-const ProductManager = require('./src/manager/ProductManager');
+const ProductManager = require('./src/dao/Fs/ProductManager');
 const { Server } = require('socket.io');
 const manager = new ProductManager('./src/json/products.json');
 
@@ -35,9 +35,8 @@ app.use((req, res, next) => {
   return next();
 });
 
-
 // Configuro mi DB
-const MONGODB_CONNECT = 'mongodb+srv://Reinharth:eFekpaHljQD7Yts1@cluster0.pzw8zqf.mongodb.net/43375?retryWrites=true&w=majority';
+const MONGODB_CONNECT = 'mongodb+srv://Reinharth:eFekpaHljQD7Yts1@cluster0.pzw8zqf.mongodb.net/ecommerce?retryWrites=true&w=majority';
 mongoose.connect(MONGODB_CONNECT, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Conexión exitosa a la base de datos');
@@ -67,5 +66,6 @@ io.on('connection', (socket) => {
   io.emit('Mensaje Back-end', 'Mensaje enviado desde Back-end');
 });
 
+//Inicializo servidor
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log(`Servidor arriba desde puerto ${PORT}`));

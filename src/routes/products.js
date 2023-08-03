@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const fs = require ('fs')
 const productsRouter = Router()
-const ProductManager = require('../manager/ProductManager')
+const ProductManager = require('../dao/Fs/ProductManager')
 const manager = new ProductManager('./src/json/products.json')
 
 //Probando Middleware

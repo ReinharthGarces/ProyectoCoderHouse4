@@ -24,7 +24,7 @@ socket.on('eliminarProducto', (productId) => {
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i]
-    const idCell = row.getElementsByTagName("td")[0]
+    const idCell = row.getElementsByTagName("td")[productId]
     const id = idCell.textContent
 
     if (id === productId) {
