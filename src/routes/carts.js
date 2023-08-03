@@ -2,6 +2,9 @@ const { Router } = require('express')
 const fs = require('fs')
 const cartsRouter = Router()
 const CartManager = require('../dao/Fs/cartManager')
+const { createCart } = require('../dao/Db/cartsManagerDb')
+
+
 const manager = new CartManager('./src/json/carts.json')
 
 //Probando Middleware 
@@ -13,9 +16,10 @@ cartsRouter.use((req,res,next) =>{
 //Metodo POST
 cartsRouter.post('/', async (req, res) => {
   try {
-    const carts = await manager.createCart();
-    console.log('El carrito se ha guardado correctamente');
-    res.status(201).json(carts);
+    // const carts = await manager.createCart();
+    const cartId = await createCart();
+    console.log('Cart ID:', cartId);
+    res.send(cartId);
   } catch (error) {
     console.log('Error al escribir en el archivo:', error);
     res.status(500).json({ error: 'Error al guardar el carrito' });

@@ -1,4 +1,3 @@
-//Primera Pre-Entrega
 const fs = require('fs')
 
 class CartManager {

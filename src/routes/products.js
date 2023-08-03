@@ -1,11 +1,12 @@
 const { Router } = require('express')
-const fs = require ('fs')
+const fs = require('fs')
 const productsRouter = Router()
 const ProductManager = require('../dao/Fs/ProductManager')
+const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
 const manager = new ProductManager('./src/json/products.json')
 
 //Probando Middleware
-productsRouter.use((req,res,next) =>{
+productsRouter.use((req, res, next) => {
   console.log('Middleware en productsRouter')
   return next()
 })
@@ -13,27 +14,31 @@ productsRouter.use((req,res,next) =>{
 //Metodo GET
 productsRouter.get('/', async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit)
-    const products = await manager.getProducts()
+    const limit = parseInt(req.query.limit);
+    console.log(limit);
+    // const products = await manager.getProducts()
+    const result = await getAllProducts();
 
     if (!isNaN(limit) && limit > 0) {
-      const limitedProducts = products.slice(0, parseInt(limit))
-      console.log(limitedProducts)
-      return res.json(limitedProducts)
+      const limitedProducts = result.slice(0, parseInt(limit));
+      console.log(limitedProducts);
+      return res.json(limitedProducts);
     }
 
-    res.json(products)
+    // If no limit is specified, return all products
+    res.json(result);
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al obtener los productos' })
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener los productos' });
   }
-})
-
+});
 //Metodo GET/:pid
 productsRouter.get('/:pid', async (req, res) => {
   try {
-    const productId = parseInt(req.params.pid)
-    const product = await manager.getProductsById(productId)
+    // const productId = parseInt(req.params.pid)
+    const productId = req.params.pid
+    // const product = await manager.getProductsById(productId)
+    const product = await getProductById(productId)
     if (!product) {
       return res.status(404).json({ error: 'Producto no encontrado' })
     }
@@ -45,59 +50,65 @@ productsRouter.get('/:pid', async (req, res) => {
 })
 
 //Metodo POST
-productsRouter.post('/', async (req, res) => {
-  const product = req.body;
-  if (!product || Object.values(product).some(value => !value)) {
-    return res.status(400).json({ status: "error", error: "Incomplete values" });
-  }
 
+productsRouter.post('/', async (req, res) => {
   try {
-    // Aquí se agrega el producto al archivo JSON utilizando el objeto manager
-    const result = await manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail); 
-    if (typeof result === "string") {
-      console.error("Error al agregar el producto:", result); // Agregamos un mensaje de error adicional
-      return res.status(400).json({ status: "error", error: result });
+
+
+    const product = req.body;
+    const requiredFields = ['name', 'description', 'code', 'price', 'stock', 'thumbnail'];
+
+    const isDataValid = requiredFields.every((field) => product[field]);
+    if (!isDataValid) {
+      return res.status(400).json({ status: 'error', error: 'Incomplete values' });
     }
 
-    return res.status(201).json({ status: "success", message: "Product created" });
+    // const result = await manager.addProduct(product.name, product.description,
+    const result = await createProduct(product);
+    if (typeof result === 'string') {
+      console.error('Error al agregar el producto:', result);
+      return res.status(400).json({ status: 'error', error: result });
+    }
+
+    return res.status(201).json({ status: 'success', message: 'Product created' });
   } catch (error) {
-    console.error("Error al agregar el producto:", error); // Agregamos un mensaje de error adicional
-    return res.status(500).json({ status: "error", error: "Failed to create product" });
+    console.error('Error al agregar el producto:', error);
+    return res.status(500).json({ status: 'error', error: 'Failed to create product' });
   }
 });
 
-//Metodo PUT
+// //Metodo PUT
 productsRouter.put('/:pid', async (req, res) => {
-  const data = req.body
+  try {
+    const productId = req.params.pid;
+    const updatedProduct = req.body;
 
-  const productId = parseInt(req.params.pid)
-  const products = await manager.getProducts()
-  const product = products.find(product => product.id === productId)
+    // manager.updateProduct(product.id, data)
+    const product = await updateProductById(productId, updatedProduct);
 
-  if (!product) {
-    return res.status(404).json({
-      error: 'Product not found'
-    })
+    return res.json(product);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    return res.status(500).json({ status: 'error', error: 'Failed to update product' });
   }
+});
 
-  product.id = product.id
-  product.name = data.name || product.name
-  product.description = data.description || product.description
-  product.code = data.code || product.code
-  product.price = data.price || product.price
-  product.stock = data.stock || product.stock
-  product.thumbnail = data.thumbnail || product.thumbnail
 
-  manager.updateProduct(product.id, data)
-  return res.json(product)
-})
 
 //Metodo DELETE
 productsRouter.delete('/:pid', async (req, res) => {
-  const productId = parseInt(req.params.pid)
-  manager.deleteProduct(productId)
+  try {
+    const productId = req.params.pid;
 
-  return res.status(204).json({})
-})
+    // manager.deleteProduct(productId)
+    const product = await deleteProductById(productId);
+
+    return res.json({ message: `El siguiente producto fue eliminado: ${product}` });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    return res.status(500).json({ status: 'error', error: 'Failed to delete product' });
+  }
+});
+
 
 module.exports = productsRouter

@@ -35,16 +35,18 @@ app.use((req, res, next) => {
   return next();
 });
 
-// Configuro mi DB
-const MONGODB_CONNECT = 'mongodb+srv://Reinharth:eFekpaHljQD7Yts1@cluster0.pzw8zqf.mongodb.net/ecommerce?retryWrites=true&w=majority';
-mongoose.connect(MONGODB_CONNECT, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
+async function connectToDatabase() {
+  try {
+    const MONGODB_CONNECT = process.env.MONGODB_CONNECT;
+    await mongoose.connect(MONGODB_CONNECT);
     console.log('Conexión exitosa a la base de datos');
-  })
-  .catch((err) => {
+  } catch (err) {
     console.log('No se pudo conectar a la base de datos', err);
     process.exit();
-  });
+  }
+}
+
+// Llamar a la función para establecer la conexión con la base de datos
 
 // Inicializo mi webSockets
 io.on('connection', (socket) => {
@@ -52,20 +54,21 @@ io.on('connection', (socket) => {
   io.on('Mi mensaje', (data) => {
     console.log(data);
   });
-
+  
   socket.on('enviarNuevoProducto', (product) => {
     console.log('Nuevo producto recibido:', product);
     io.emit('nuevoProducto', product);
   });
-
+  
   socket.on('eliminarProducto', (product) => {
     console.log('Producto eliminado', product)
     io.emit('productoEliminado', product)
-
+    
   })
   io.emit('Mensaje Back-end', 'Mensaje enviado desde Back-end');
 });
 
 //Inicializo servidor
+connectToDatabase();
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log(`Servidor arriba desde puerto ${PORT}`));
