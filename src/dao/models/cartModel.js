@@ -4,4 +4,4 @@ const cartSchema = mongoose.Schema({
   products:[]
 })
 
-module.exports = mongoose.model('cart', cartSchema)
+module.exports = mongoose.model('carts', cartSchema)

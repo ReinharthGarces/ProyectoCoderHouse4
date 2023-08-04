@@ -16,7 +16,7 @@ productsRouter.get('/', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit);
     console.log(limit);
-    // const products = await manager.getProducts()
+// const products = await manager.getProducts() (fs)
     const result = await getAllProducts();
 
     if (!isNaN(limit) && limit > 0) {
@@ -25,19 +25,19 @@ productsRouter.get('/', async (req, res) => {
       return res.json(limitedProducts);
     }
 
-    // If no limit is specified, return all products
     res.json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener los productos' });
   }
 });
+
 //Metodo GET/:pid
 productsRouter.get('/:pid', async (req, res) => {
   try {
     // const productId = parseInt(req.params.pid)
     const productId = req.params.pid
-    // const product = await manager.getProductsById(productId)
+// const product = await manager.getProductsById(productId) (fs)
     const product = await getProductById(productId)
     if (!product) {
       return res.status(404).json({ error: 'Producto no encontrado' })
@@ -50,11 +50,8 @@ productsRouter.get('/:pid', async (req, res) => {
 })
 
 //Metodo POST
-
 productsRouter.post('/', async (req, res) => {
   try {
-
-
     const product = req.body;
     const requiredFields = ['name', 'description', 'code', 'price', 'stock', 'thumbnail'];
 
@@ -63,7 +60,7 @@ productsRouter.post('/', async (req, res) => {
       return res.status(400).json({ status: 'error', error: 'Incomplete values' });
     }
 
-    // const result = await manager.addProduct(product.name, product.description,
+// const result = await manager.addProduct(product.name, product.description,...) (fs) 
     const result = await createProduct(product);
     if (typeof result === 'string') {
       console.error('Error al agregar el producto:', result);
@@ -82,8 +79,7 @@ productsRouter.put('/:pid', async (req, res) => {
   try {
     const productId = req.params.pid;
     const updatedProduct = req.body;
-
-    // manager.updateProduct(product.id, data)
+// manager.updateProduct(product.id, data) (fs)
     const product = await updateProductById(productId, updatedProduct);
 
     return res.json(product);
@@ -99,10 +95,8 @@ productsRouter.put('/:pid', async (req, res) => {
 productsRouter.delete('/:pid', async (req, res) => {
   try {
     const productId = req.params.pid;
-
-    // manager.deleteProduct(productId)
-    const product = await deleteProductById(productId);
-
+// manager.deleteProduct(productId) (fs)
+    const product = await deleteProductById(productId)
     return res.json({ message: `El siguiente producto fue eliminado: ${product}` });
   } catch (error) {
     console.error('Error deleting product:', error);
