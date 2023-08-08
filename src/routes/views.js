@@ -7,15 +7,15 @@ const { getAllProducts, createProduct, getProductById, updateProductById, delete
 
 //Vista home.handlebars
 viewsRouter.get('/home', async (req,res) => {
-  const products =  await getAllProducts()
-  console.log(products)
+  const productsFromDB =  await getAllProducts()
+  const products = productsFromDB.map(product => product.toObject())
   return res.render('home', { title: 'ReinharthApp-Inicio', style: 'home.css', products })
 })
 
 //Vista realTimeProducts.Handlebars
 viewsRouter.get('/realtimeproducts', async (req,res) => {
-  const products =  await getAllProducts()
-  console.log(products)
+  const productsFromDB =  await getAllProducts()
+  const products = productsFromDB.map(product => product.toObject())
   return res.render('realTimeProducts', { title: 'ReinharthApp-Products', style: 'realTimeProducts.css', products })
 })
 
@@ -27,7 +27,8 @@ viewsRouter.post('/realtimeproducts', async (req,res) => {
     return res.status(400).json({status: "error", error: "Incomplete values"})
   }
   try {
-    const products = await getAllProducts()
+    const productsFromDB =  await getAllProducts()
+    const products = productsFromDB.map(product => product.toObject())
     createProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });

@@ -19,7 +19,6 @@ const sendFormToServer = (event) => {
     .then((response) => response.json())
     .then((data) => {
       const products = data;
-      const id = products.length + 1; 
       const name = nameInput.value;
       const description = descriptionInput.value;
       const code = codeInput.value;
@@ -27,7 +26,7 @@ const sendFormToServer = (event) => {
       const stock = stockInput.value;
       const thumbnail = thumbnailInput.value;
 
-      console.log({ id, name, description, code, price, stock, thumbnail });
+      console.log({ _id, name, description, code, price, stock, thumbnail });
 
       fetch(`/api/products`, {
         method: 'Post',
@@ -35,11 +34,11 @@ const sendFormToServer = (event) => {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        body: JSON.stringify({ id, name, description, code, price, stock, thumbnail }),
+        body: JSON.stringify({ _id, name, description, code, price, stock, thumbnail }),
       }).then((response) => {
         if (response.ok) {
           socket.emit('enviarNuevoProducto', {
-            id,
+            _id,
             name,
             description,
             code,
@@ -75,13 +74,13 @@ socket.on("nuevoProducto", (product) => {
 });
 
 //Elimino producto de la tabla 
-const deleteProduct = (id) => {
-  fetch(`/api/products/${id}`, {
+const deleteProduct = (_id) => {
+  fetch(`/api/products/${_id}`, {
     method: "DELETE",
   })
     .then((response) => {
       if (response.ok) {
-        const rowToDelete = document.getElementById(`deleteButton_${id}`)
+        const rowToDelete = document.getElementById(`deleteButton_${_id}`)
           .parentNode.parentNode;
             rowToDelete.remove();
         socket.emit('eliminarProducto')
@@ -96,7 +95,7 @@ const deleteProduct = (id) => {
 
 document.addEventListener("click", (event) => {
   if (event.target.classList.contains("deleteButton")) {
-    const productId = event.target.id.split("_")[1]
+    const productId = event.target._id.split("_")[1]
     deleteProduct(productId)
   }
 
