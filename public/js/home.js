@@ -7,7 +7,7 @@ socket.on('nuevoProducto', (product) => {
   const tableBody = document.querySelector("#productos");
   const newRow = document.createElement("tr");
   newRow.innerHTML = `
-    <td>${product.id}</td>
+    <td>${product._id}</td>
     <td>${product.name}</td>
     <td>${product.description}</td>
     <td>${product.code}</td>

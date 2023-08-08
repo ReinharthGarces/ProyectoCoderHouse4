@@ -1,20 +1,21 @@
 const { Router } = require('express')
-
 const viewsRouter = Router()
-const ProductManager = require('../dao/Fs/ProductManager')
-const manager = new ProductManager('./src/json/products.json')
-
+const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
+// const ProductManager = require('../dao/Fs/ProductManager')
+// const manager = new ProductManager('./src/json/products.json')
 
 
 //Vista home.handlebars
 viewsRouter.get('/home', async (req,res) => {
-  const products =  await manager.getProducts()
-  return res.render('home', { title: 'ReinharthApp', style: 'home.css', products })
+  const products =  await getAllProducts()
+  console.log(products)
+  return res.render('home', { title: 'ReinharthApp-Inicio', style: 'home.css', products })
 })
 
 //Vista realTimeProducts.Handlebars
 viewsRouter.get('/realtimeproducts', async (req,res) => {
-  const products =  await manager.getProducts()
+  const products =  await getAllProducts()
+  console.log(products)
   return res.render('realTimeProducts', { title: 'ReinharthApp-Products', style: 'realTimeProducts.css', products })
 })
 
@@ -26,8 +27,8 @@ viewsRouter.post('/realtimeproducts', async (req,res) => {
     return res.status(400).json({status: "error", error: "Incomplete values"})
   }
   try {
-    const products = await manager.getProducts()
-    manager.addProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
+    const products = await getAllProducts()
+    createProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });
     }
@@ -36,5 +37,12 @@ viewsRouter.post('/realtimeproducts', async (req,res) => {
     return res.status(500).json({ status: "error", error: "Failed to create product" })
   }
 })
+
+//Vista chat.handlebars
+viewsRouter.get('/chat', async (req,res) => {
+  // const products =  await manager.getProducts()
+  return res.render('chat', { title: 'ReinharthApp-chat', style: 'chat.css' })
+})
+
 
 module.exports = viewsRouter
