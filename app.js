@@ -7,10 +7,12 @@ const productsRouter = require('./src/routes/products');
 const cartsRouter = require('./src/routes/carts');
 const viewsRouter = require('./src/routes/views');
 const ProductManager = require('./src/dao/Fs/ProductManager');
-const { Server } = require('socket.io');
 const manager = new ProductManager('./src/json/products.json');
+const { Server } = require('socket.io');
+const { saveMessage , getAllMessages } = require('./src/dao/Db/messageManagerDb')
 
 require('dotenv').config();
+// const messageLogs = []
 
 // Configuro mi servidor
 const app = express();
@@ -63,8 +65,28 @@ io.on('connection', (socket) => {
   socket.on('eliminarProducto', (product) => {
     console.log('Producto eliminado', product)
     io.emit('productoEliminado', product)
-    
-  })
+  })   
+
+  //socket.on del CHAT
+  socket.on('userConnected', (user) => {
+    console.log(`${user} se ha unido al chat`);
+    socket.user = user;
+  });
+
+  socket.on('sendMessage', async (message) => {
+    const user = socket.user;
+    const action = await saveMessage(socket.user, message);
+    const messageLogs = await getAllMessages()
+    console.log(`Nuevo mensaje de ${user}: ${message}`);
+    // // Agregar el mensaje a los logs y emitir a todos los clientes
+    // messageLogs.push({ user, message });
+    io.emit('messageLogs', messageLogs);
+  });
+
+  socket.on('disconnect', () => {
+    const user = socket.user;
+    console.log(`${user} se ha desconectado`);
+  });
   io.emit('Mensaje Back-end', 'Mensaje enviado desde Back-end');
 });
 

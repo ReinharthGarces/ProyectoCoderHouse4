@@ -1,5 +1,5 @@
 const socket = io();
-socket.emit("Mi mensaje", console.log("Mensaje enviado desde cliente"))
+
 socket.on("Mensaje Back-end", (data) => {
   console.log(data);
 });
@@ -12,91 +12,75 @@ const priceInput = document.getElementById("priceInput");
 const stockInput = document.getElementById("stockInput");
 const thumbnailInput = document.getElementById("thumbnailInput");
 
-const sendFormToServer = (event) => {
-  // event.preventDefault();
+const sendFormToServer = async (event) => {
+  event.preventDefault();
 
-  fetch('/api/products')
-    .then((response) => response.json())
-    .then((data) => {
-      const products = data;
-      const name = nameInput.value;
-      const description = descriptionInput.value;
-      const code = codeInput.value;
-      const price = priceInput.value;
-      const stock = stockInput.value;
-      const thumbnail = thumbnailInput.value;
+  try {
+    const newProduct = {
+      name: nameInput.value,
+      description: descriptionInput.value,
+      code: codeInput.value,
+      price: priceInput.value,
+      stock: stockInput.value,
+      thumbnail: thumbnailInput.value,
+    };
 
-      console.log({ _id, name, description, code, price, stock, thumbnail });
-
-      fetch(`/api/products`, {
-        method: 'Post',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({ _id, name, description, code, price, stock, thumbnail }),
-      }).then((response) => {
-        if (response.ok) {
-          socket.emit('enviarNuevoProducto', {
-            _id,
-            name,
-            description,
-            code,
-            price,
-            stock,
-            thumbnail,
-          });
-          form.reset();
-        } else {
-          console.error('Error al crear el producto');
-        }
-      });
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(newProduct),
     });
+
+    if (response.ok) {
+      const productData = await response.json();
+      socket.emit('enviarNuevoProducto', productData);
+      console.log('Producto creado en el servidor:', productData);
+      form.reset();
+    } else {
+      console.error('Error al crear el producto');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
 };
 
 form.addEventListener("submit", sendFormToServer);
 
 socket.on("nuevoProducto", (product) => {
-  console.log('Nuevo producto recibido en el servidor:', product)
+  console.log('Nuevo producto recibido en el servidor:', product);
   const tableBody = document.querySelector("#productos");
   const newRow = document.createElement("tr");
   newRow.innerHTML = `
-    <td>${product.id}</td>
+    <td>${product._id}</td>
     <td>${product.name}</td>
     <td>${product.description}</td>
     <td>${product.code}</td>
     <td>${product.price}</td>
     <td>${product.stock}</td>
     <td>${product.thumbnail}</td>
-    <td><button class="deleteButton" id="deleteButton_${product.id}" onclick="deleteProduct(${product.id})">Borrar</button></td>
+    <td><button class="deleteButton" id="deleteButton_${product._id}" onclick="deleteProduct('${product._id}')">Borrar</button></td>
   `;
   tableBody.appendChild(newRow);
 });
 
-//Elimino producto de la tabla 
-const deleteProduct = (_id) => {
-  fetch(`/api/products/${_id}`, {
-    method: "DELETE",
-  })
-    .then((response) => {
-      if (response.ok) {
-        const rowToDelete = document.getElementById(`deleteButton_${_id}`)
-          .parentNode.parentNode;
-            rowToDelete.remove();
-        socket.emit('eliminarProducto')
-      } else {
-        console.error("Error al eliminar el producto");
-      }
-    })
-    .catch((error) => {
-      console.error("Error al eliminar el producto", error);
-    })
-};
+async function deleteProduct(productId) {
+  try {
+    const deleteResponse = await fetch(`/api/products/${productId}`, {
+      method: 'DELETE',
+    });
 
-document.addEventListener("click", (event) => {
-  if (event.target.classList.contains("deleteButton")) {
-    const productId = event.target._id.split("_")[1]
-    deleteProduct(productId)
+    if (deleteResponse.ok) {
+      const deleteButton = document.getElementById(`deleteButton_${productId}`);
+      deleteButton.closest('tr').remove();
+      socket.emit('eliminarProducto');
+    } else {
+      console.error('Error al borrar el producto');
+    }
+  } catch (error) {
+    console.error('Error:', error);
   }
+}
 
-});

@@ -13,14 +13,14 @@ viewsRouter.get('/home', async (req,res) => {
 })
 
 //Vista realTimeProducts.Handlebars
-viewsRouter.get('/realtimeproducts', async (req,res) => {
+viewsRouter.get('/realTimeProducts', async (req,res) => {
   const productsFromDB =  await getAllProducts()
   const products = productsFromDB.map(product => product.toObject())
   return res.render('realTimeProducts', { title: 'ReinharthApp-Products', style: 'realTimeProducts.css', products })
 })
 
 //Metodo POST realTimeProducts.Handlebars 
-viewsRouter.post('/realtimeproducts', async (req,res) => {
+viewsRouter.post('/realTimeProducts', async (req,res) => {
   const product = req.body
 
   if(!product.name || !product.description || !product.code || !product.price || !product.stock || !product.thumbnail){
@@ -29,7 +29,7 @@ viewsRouter.post('/realtimeproducts', async (req,res) => {
   try {
     const productsFromDB =  await getAllProducts()
     const products = productsFromDB.map(product => product.toObject())
-    createProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
+    const result = await createProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });
     }

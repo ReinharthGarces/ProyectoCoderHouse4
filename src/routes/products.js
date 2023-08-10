@@ -14,7 +14,7 @@ productsRouter.use((req, res, next) => {
 //Metodo GET
 productsRouter.get('/', async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit);
+    const limit = parseInt(req.query.limit) || 10
     console.log(limit);
 // const products = await manager.getProducts() (fs)
     const result = await getAllProducts();
