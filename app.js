@@ -2,6 +2,8 @@ console.clear();
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const handlebars = require('express-handlebars');
 const productsRouter = require('./src/routes/products');
 const cartsRouter = require('./src/routes/carts');
@@ -22,6 +24,7 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(cookieParser('secretkey'));
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/', viewsRouter);
@@ -62,9 +65,9 @@ io.on('connection', (socket) => {
     io.emit('nuevoProducto', product);
   });
   
-  socket.on('eliminarProducto', (product) => {
-    console.log('Producto eliminado', product)
-    io.emit('productoEliminado', product)
+  socket.on('eliminarProducto', (productId) => {
+    console.log('Producto eliminado', productId)
+    io.emit('productoEliminado', productId)
   })   
 
   //socket.on del CHAT

@@ -9,7 +9,7 @@
     <th>Stock:</th>
   </tr>
   {{#each products}}
-    <tr>
+    <tr id="{{this._id}}">
       <td>{{this._id}}</td>
       <td>{{this.name}}</td>
       <td>{{this.description}}</td>
@@ -21,12 +21,12 @@
   
 </table>
 
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/home.js"></script>
+
 {{!-- {{#if hasPrevPage}}
 <a href="/home?page={{prevPage}}">Pagina previa</a>
 {{/if}}
 {{#if hasNextPage}}
 <a href="/home?page={{nextPage}}">Pagina siguiente</a>
 {{/if}} --}}
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/home.js"></script>

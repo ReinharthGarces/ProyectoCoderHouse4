@@ -89,12 +89,10 @@ productsRouter.put('/:pid', async (req, res) => {
   }
 });
 
-
-
 //Metodo DELETE
 productsRouter.delete('/:pid', async (req, res) => {
   try {
-    const productId = req.params.pid;
+    const productId = req.params.pid
 // manager.deleteProduct(productId) (fs)
     const product = await deleteProductById(productId)
     return res.json({ message: `El siguiente producto fue eliminado: ${product}` });

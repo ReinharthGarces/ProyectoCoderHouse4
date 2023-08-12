@@ -32,8 +32,9 @@ viewsRouter.post('/realTimeProducts', async (req,res) => {
     const result = await createProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });
-    }
-    return res.redirect('/realTimeProducts')
+    } else {
+      return res.redirect('/realTimeProducts')
+    }	
   } catch (error) {
     return res.status(500).json({ status: "error", error: "Failed to create product" })
   }
