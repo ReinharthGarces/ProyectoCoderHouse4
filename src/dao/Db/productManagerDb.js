@@ -59,6 +59,7 @@ async function updateProductById(_id, updatedProduct) {
   existingProduct.code = updatedProduct.code || existingProduct.code;
   existingProduct.price = updatedProduct.price || existingProduct.price;
   existingProduct.stock = updatedProduct.stock || existingProduct.stock;
+  existingProduct.category = updatedProduct.category || existingProduct.category;
   existingProduct.thumbnail = updatedProduct.thumbnail || existingProduct.thumbnail;
 
 // Guardar los cambios
@@ -86,5 +87,5 @@ async function deleteProductById(_id) {
 
 
 module.exports = {
-    getAllProducts, createProduct, getProductById, updateProductById, deleteProductById
+  getAllProducts, createProduct, getProductById, updateProductById, deleteProductById
 };

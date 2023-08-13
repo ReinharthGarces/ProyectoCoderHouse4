@@ -7,6 +7,8 @@
     <th>Code:</th>
     <th>Price:</th>
     <th>Stock:</th>
+    <th>Category:</th>
+    <th>Thumbnail:</th>
   </tr>
   {{#each products}}
     <tr id="{{this._id}}">
@@ -16,6 +18,8 @@
       <td>{{this.code}}</td>
       <td>{{this.price}}</td>
       <td>{{this.stock}}</td>
+      <td>{{this.category}}</td>
+      <td>{{this.thumbnail}}</td>
     </tr>
   {{/each}}
   

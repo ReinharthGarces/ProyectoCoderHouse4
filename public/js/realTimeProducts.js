@@ -10,6 +10,7 @@ const descriptionInput = document.getElementById("descriptionInput");
 const codeInput = document.getElementById("codeInput");
 const priceInput = document.getElementById("priceInput");
 const stockInput = document.getElementById("stockInput");
+const caregoryInput = document.getElementById("categoryInput");
 const thumbnailInput = document.getElementById("thumbnailInput");
 
 const sendFormToServer = async (event) => {
@@ -21,6 +22,7 @@ const sendFormToServer = async (event) => {
       code: codeInput.value,
       price: priceInput.value,
       stock: stockInput.value,
+      category: caregoryInput.value,
       thumbnail: thumbnailInput.value,
     };
     console.log(newProduct)
@@ -61,6 +63,7 @@ socket.on("nuevoProducto", (product) => {
     <td>${product.code}</td>
     <td>${product.price}</td>
     <td>${product.stock}</td>
+    <td>${product.category}</td>
     <td>${product.thumbnail}</td>
     <td><button class="deleteButton" id="${product._id}">Borrar</button></td>
   `;

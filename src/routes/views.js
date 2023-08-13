@@ -23,13 +23,13 @@ viewsRouter.get('/realTimeProducts', async (req,res) => {
 viewsRouter.post('/realTimeProducts', async (req,res) => {
   const product = req.body
 
-  if(!product.name || !product.description || !product.code || !product.price || !product.stock || !product.thumbnail){
+  if(!product.name || !product.description || !product.code || !product.price || !product.stock || !product.category || !product.thumbnail){
     return res.status(400).json({status: "error", error: "Incomplete values"})
   }
   try {
     const productsFromDB =  await getAllProducts()
     const products = productsFromDB.map(product => product.toObject())
-    const result = await createProduct(product.name, product.description, product.code, product.price, product.stock, product.thumbnail)
+    const result = await createProduct(product.name, product.description, product.code, product.price, product.stock, product.category, product.thumbnail)
     if (typeof result === "string") {
       return res.status(400).json({ status: "error", error: result });
     } else {

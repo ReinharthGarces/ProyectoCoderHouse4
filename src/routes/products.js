@@ -1,9 +1,9 @@
 const { Router } = require('express')
 const fs = require('fs')
 const productsRouter = Router()
-const ProductManager = require('../dao/Fs/ProductManager')
+// const ProductManager = require('../dao/Fs/ProductManager')
+// const manager = new ProductManager('./src/json/products.json')
 const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
-const manager = new ProductManager('./src/json/products.json')
 
 //Probando Middleware
 productsRouter.use((req, res, next) => {
@@ -14,28 +14,42 @@ productsRouter.use((req, res, next) => {
 //Metodo GET
 productsRouter.get('/', async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10
-    console.log(limit);
-// const products = await manager.getProducts() (fs)
-    const result = await getAllProducts();
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const sort = req.query.sort
+    const category = req.query.category 
 
-    if (!isNaN(limit) && limit > 0) {
-      const limitedProducts = result.slice(0, parseInt(limit));
-      console.log(limitedProducts);
-      return res.json(limitedProducts);
+    let result = await getAllProducts();
+
+    // Aplicar filtro por categoría (si se proporciona)
+    if (category) {
+      result = result.filter(product => product.category === category);
     }
 
-    res.json(result);
+    // Aplicar ordenamiento por sort (si se proporciona)
+    if (sort === 'asc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sort === 'desc') {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    // Calcular índices para paginación
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    // Obtener los productos para la página actual
+    const limitedProducts = result.slice(startIndex, endIndex);
+    res.json(limitedProducts);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener los productos' });
   }
 });
 
+
 //Metodo GET/:pid
 productsRouter.get('/:pid', async (req, res) => {
   try {
-  // const productId = parseInt(req.params.pid)
   // const product = await manager.getProductsById(productId) (fs)
     const productId = req.params.pid
     const product = await getProductById(productId)
@@ -53,7 +67,7 @@ productsRouter.get('/:pid', async (req, res) => {
 productsRouter.post('/', async (req, res) => {
   try {
     const product = req.body;
-    const requiredFields = ['name', 'description', 'code', 'price', 'stock', 'thumbnail'];
+    const requiredFields = ['name', 'description', 'code', 'price', 'stock', 'category', 'thumbnail'];
 
     const isDataValid = requiredFields.every((field) => product[field]);
     if (!isDataValid) {
@@ -104,3 +118,6 @@ productsRouter.delete('/:pid', async (req, res) => {
 
 
 module.exports = productsRouter
+
+
+

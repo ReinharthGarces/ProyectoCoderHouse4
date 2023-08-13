@@ -5,6 +5,7 @@
   <label for="code"><strong>Code: </strong><input id="codeInput" type="text" name="code"></label>
   <label for="price"><strong>Price: </strong><input id="priceInput" type="text" name="price"></label>
   <label for="stock"><strong>Stock: </strong><input id="stockInput" type="text" name="stock"></label>
+  <label for="category"><strong>Category: </strong><input id="categoryInput" type="text" name="category"></label>
   <label for="thumbnail"><strong>Thumbnail: </strong><input id="thumbnailInput" type="text" name="thumbnail"></label>
   <input class="sendButton" id="sendButton" type="submit" value="Send">
 </form>
@@ -18,6 +19,7 @@
     <th>Code:</th>
     <th>Price:</th>
     <th>Stock:</th>
+    <th>Category:</th>
     <th>Thumbnail:</th>
   </tr>
   {{#each products}}
@@ -28,6 +30,7 @@
       <td>{{this.code}}</td>
       <td>{{this.price}}</td>
       <td>{{this.stock}}</td>
+      <td>{{this.category}}</td>
       <td>{{this.thumbnail}}</td>
       <td>
         <button class="deleteButton" id="{{this._id}}">Delete</button>

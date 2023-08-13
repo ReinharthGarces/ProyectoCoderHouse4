@@ -12,6 +12,8 @@ function agregarFilaProducto(product) {
     <td>${product.code}</td>
     <td>${product.price}</td>
     <td>${product.stock}</td>
+    <td>${product.category}</td>
+    <td>${product.thumbnail}</td>
   `;
   tableBody.appendChild(newRow);
 }
