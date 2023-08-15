@@ -16,11 +16,18 @@ productsRouter.get('/', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 1;
-    const sort = req.query.sort
-    const category = req.query.category 
+    const query = req.query.query || '';
+    const category = req.query.category || '';
+    const sort = req.query.sort || '';
+    const available = req.query.available || '';
 
     let result = await getAllProducts();
 
+     // Aplicar filtro por query (si se proporciona)
+    if (query) {
+      result = result.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
+    }
+    
     // Aplicar filtro por categoría (si se proporciona)
     if (category) {
       result = result.filter(product => product.category === category);
@@ -33,13 +40,33 @@ productsRouter.get('/', async (req, res) => {
       result.sort((a, b) => b.price - a.price);
     }
 
-    // Calcular índices para paginación
+    // Aplicar filtro por disponibilidad (si se proporciona) - Cambio aquí
+    if (available === 'available') {
+      result = result.filter(product => product.stock !== 0);
+    }
+    
+    // Calcular total de páginas y definir índices para paginación
+    const totalPages = Math.ceil(result.length / limit);
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
 
     // Obtener los productos para la página actual
     const limitedProducts = result.slice(startIndex, endIndex);
-    res.json(limitedProducts);
+
+    const response = {
+      status: 'success',
+      payload: limitedProducts,
+      totalPages: totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+      page: page,
+      hasPrevPage: page > 1,
+      hasNextPage: page < totalPages,
+      prevLink: page > 1 ? `/productos?page=${page - 1}&limit=${limit}` : null,
+      nextLink: page < totalPages ? `/productos?page=${page + 1}&limit=${limit}` : null
+    };
+
+    res.json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener los productos' });
@@ -47,21 +74,29 @@ productsRouter.get('/', async (req, res) => {
 });
 
 
-//Metodo GET/:pid
+//Metodo GET/:pid y confirmando si hay stock!
 productsRouter.get('/:pid', async (req, res) => {
   try {
-  // const product = await manager.getProductsById(productId) (fs)
-    const productId = req.params.pid
-    const product = await getProductById(productId)
+    const productId = req.params.pid;
+    const product = await getProductById(productId);
+
     if (!product) {
-      return res.status(404).json({ error: 'Producto no encontrado' })
+      return res.status(404).json({ error: 'Producto no encontrado' });
     }
-    res.status(200).json(product)
+
+    const isAvailable = product.stock > 0;
+    const response = {
+      available: isAvailable,
+      product: product
+    };
+
+    res.status(200).json(response);
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al obtener el producto' })
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener el producto' });
   }
-})
+});
+
 
 //Metodo POST
 productsRouter.post('/', async (req, res) => {
