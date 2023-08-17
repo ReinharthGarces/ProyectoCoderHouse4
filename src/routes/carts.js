@@ -47,34 +47,56 @@ cartsRouter.post('/:cid/products/:pid', async (req, res) => {
   const pid = req.params.pid;
 
   try {
-    const cartId = new mongoose.Types.ObjectId(cid);
-    const productId = new mongoose.Types.ObjectId(pid);
-    const cart = await cartModel.findOne({ _id: cartId });
-    const existingProduct = cart.products.find((products) => products._id.toString() === productId.toString());
-    console.log('Cart obtenido:', cart);
+    const cart = await cartModel.findById(cid);
 
     if (!cart) {
       return res.status(404).json({ error: 'Carrito no encontrado' });
     }
+
+    const existingProduct = cart.products.find(product => product._id.toString() === pid);
+
     if (existingProduct) {
+      console.log('Antes de actualizar la cantidad:', existingProduct);
+      if (!existingProduct.quantity) {
+        existingProduct.quantity = 0;
+      }
       existingProduct.quantity += 1;
-      console.log('Producto encontrado:', existingProduct);
+      console.log('Después de actualizar la cantidad:', existingProduct);
     } else {
       cart.products.push({ _id: pid, quantity: 1 });
       console.log('Producto nuevo, agregando al carrito');
     }
-    await cart.save();
 
-    console.log('Datos del carrito actualizados y guardados');
-    const allCarts = await getAllCarts();
-    return res.status(200).json(allCarts);
+    const updatedCart = await cart.save(); // Guardar el carrito actualizado
+
+    // Crear una nueva estructura de productos con _id y quantity
+    const productsWithQuantity = updatedCart.products.map(product => ({
+      _id: product._id,
+      quantity: product.quantity
+    }));
+
+    console.log('Cantidades en los productos:');
+    productsWithQuantity.forEach(product => {
+      console.log(product.quantity);
+    });
+
+    const response = {
+      cartId: cart._id,
+      products: productsWithQuantity
+    };
+
+    return res.status(200).json(response);
   } catch (err) {
-    console.error('Error al guardar los datos del carrito');
+    console.error('Error al guardar los datos del carrito', err);
     return res
       .status(500)
       .json({ error: 'Error al guardar los datos del carrito' });
   }
 });
+
+
+
+
 
 //Metodo DELETE/:cid/product/:pid
 cartsRouter.delete('/:cid/products/:pid', async (req, res) => {

@@ -14,7 +14,6 @@ const { Server } = require('socket.io');
 const { saveMessage , getAllMessages } = require('./src/dao/Db/messageManagerDb')
 
 require('dotenv').config();
-// const messageLogs = []
 
 // Configuro mi servidor
 const app = express();
@@ -50,8 +49,6 @@ async function connectToDatabase() {
     process.exit();
   }
 }
-
-// Llamar a la función para establecer la conexión con la base de datos
 
 // Inicializo mi webSockets
 io.on('connection', (socket) => {
