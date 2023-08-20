@@ -41,44 +41,33 @@ cartsRouter.get('/:cid', async (req, res) => {
   }
 })
 
-//Metodo POST/:cid/product/:pid
+//Metodo POST/:cid/products/:pid
 cartsRouter.post('/:cid/products/:pid', async (req, res) => {
   const cid = req.params.cid;
   const pid = req.params.pid;
 
   try {
     const cart = await cartModel.findById(cid);
-
     if (!cart) {
       return res.status(404).json({ error: 'Carrito no encontrado' });
     }
-
     const existingProduct = cart.products.find(product => product._id.toString() === pid);
 
     if (existingProduct) {
-      console.log('Antes de actualizar la cantidad:', existingProduct);
       if (!existingProduct.quantity) {
         existingProduct.quantity = 0;
       }
       existingProduct.quantity += 1;
-      console.log('Después de actualizar la cantidad:', existingProduct);
     } else {
       cart.products.push({ _id: pid, quantity: 1 });
       console.log('Producto nuevo, agregando al carrito');
     }
 
-    const updatedCart = await cart.save(); // Guardar el carrito actualizado
-
-    // Crear una nueva estructura de productos con _id y quantity
+    const updatedCart = await cart.save(); 
     const productsWithQuantity = updatedCart.products.map(product => ({
       _id: product._id,
       quantity: product.quantity
     }));
-
-    console.log('Cantidades en los productos:');
-    productsWithQuantity.forEach(product => {
-      console.log(product.quantity);
-    });
 
     const response = {
       cartId: cart._id,
@@ -95,9 +84,6 @@ cartsRouter.post('/:cid/products/:pid', async (req, res) => {
 });
 
 
-
-
-
 //Metodo DELETE/:cid/product/:pid
 cartsRouter.delete('/:cid/products/:pid', async (req, res) => {
   const cid = req.params.cid;
@@ -106,7 +92,6 @@ cartsRouter.delete('/:cid/products/:pid', async (req, res) => {
   try {
     const cartId = new mongoose.Types.ObjectId(cid);
     const productId = new mongoose.Types.ObjectId(pid);
-
     console.log('Cart ID:', cartId);
     console.log('Product ID:', productId);
 
@@ -124,7 +109,6 @@ cartsRouter.delete('/:cid/products/:pid', async (req, res) => {
 
     cart.products.splice(productIndex, 1);
     await cart.save();
-
     console.log('Producto eliminado del carrito y datos actualizados y guardados');
     
     const allCarts = await getAllCarts();
@@ -154,14 +138,6 @@ cartsRouter.put('/:cid', async (req, res) => {
       return res.status(400).json({ error: 'El cuerpo de la solicitud debe contener un arreglo de productos' });
     }
 
-    // Validación opcional: Asegurarse de que cada elemento del arreglo tenga el formato deseado
-    // for (const product of updatedProducts) {
-    //   if (!product.hasOwnProperty('productId') || !product.hasOwnProperty('quantity')) {
-    //     return res.status(400).json({ error: 'Los elementos del arreglo deben tener el formato { productId, quantity }' });
-    //   }
-    // }
-
-    // Actualizar productos en el carrito
     cart.products = updatedProducts;
     await cart.save();
 
@@ -190,7 +166,6 @@ cartsRouter.put('/:cid/products/:pid', async (req, res) => {
 
     const cartId = new mongoose.Types.ObjectId(cid);
     const productId = new mongoose.Types.ObjectId(pid);
-
     const cart = await cartModel.findOne({ _id: cartId });
 
     if (!cart) {
@@ -212,11 +187,31 @@ cartsRouter.put('/:cid/products/:pid', async (req, res) => {
     return res.status(200).json(allCarts);
   } catch (err) {
     console.error('Error al actualizar la cantidad del producto en el carrito');
-    return res
-      .status(500)
-      .json({ error: 'Error al actualizar la cantidad del producto en el carrito' });
+    return res.status(500).json({ error: 'Error al actualizar la cantidad del producto en el carrito' });
   }
 });
+
+//Metodo DELETE/:cid/
+cartsRouter.delete('/:cid', async (req, res) => {
+  const cartId = req.params.cid;
+
+  try {
+    const cart = await cartModel.findById(cartId);
+    if (!cart) {
+      return res.status(404).json({ error: 'Carrito no encontrado' });
+    }
+
+    cart.products = [];
+
+    const updatedCart = await cart.save();
+
+    return res.status(200).json(updatedCart);
+  } catch (err) {
+    console.error('Error al eliminar productos del carrito', err);
+    return res.status(500).json({ error: 'Error al eliminar productos del carrito' });
+  }
+});
+
 
 module.exports = cartsRouter
 

@@ -1,0 +1,15 @@
+<!-- products.handlebars -->
+{{#each products}}
+  <div class="product">
+    <h2>{{name}}</h2>
+    <p>Precio: {{price}}</p>
+    <p>Categoría: {{category}}</p>
+    <button onclick="window.location='/products/{{_id}}'">Ver detalles</button>
+    <form action="/carts/{{cartId}}/products/{{_id}}" method="post">
+      <button type="submit">Agregar al carrito</button>
+    </form>
+  </div>
+{{/each}}
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/products.js"></script>
