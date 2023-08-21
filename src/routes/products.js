@@ -1,15 +1,16 @@
 const { Router } = require('express')
 const fs = require('fs')
 const productsRouter = Router()
+const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
 // const ProductManager = require('../dao/Fs/ProductManager')
 // const manager = new ProductManager('./src/json/products.json')
-const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
+
 
 //Probando Middleware
-productsRouter.use((req, res, next) => {
-  console.log('Middleware en productsRouter')
-  return next()
-})
+// productsRouter.use((req, res, next) => {
+//   console.log('Middleware en productsRouter')
+//   return next()
+// })
 
 //Metodo GET
 productsRouter.get('/', async (req, res) => {
@@ -21,49 +22,58 @@ productsRouter.get('/', async (req, res) => {
     const sort = req.query.sort || '';
     const available = req.query.available || '';
 
-    let result = await getAllProducts();
+    // Obtener todos los productos
+    let allProducts = await getAllProducts();
 
-     // Aplicar filtro por query (si se proporciona)
+    // Aplicar filtros y ordenamiento
+    let filteredProducts = allProducts;
+
+    // Filtro por nombre (query)
     if (query) {
-      result = result.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
+      filteredProducts = filteredProducts.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
     }
     
-    // Aplicar filtro por categoría (si se proporciona)
+    // Filtro por categoría
     if (category) {
-      result = result.filter(product => product.category === category);
+      filteredProducts = filteredProducts.filter(product => product.category === category);
     }
 
-    // Aplicar ordenamiento por sort (si se proporciona)
+    // Ordenamiento por precio
     if (sort === 'asc') {
-      result.sort((a, b) => a.price - b.price);
+      filteredProducts.sort((a, b) => a.price - b.price);
     } else if (sort === 'desc') {
-      result.sort((a, b) => b.price - a.price);
+      filteredProducts.sort((a, b) => b.price - a.price);
     }
 
-    // Aplicar filtro por disponibilidad (si se proporciona) - Cambio aquí
+    // Filtro por disponibilidad
     if (available === 'available') {
-      result = result.filter(product => product.stock !== 0);
+      filteredProducts = filteredProducts.filter(product => product.stock !== 0);
     }
     
-    // Calcular total de páginas y definir índices para paginación
-    const totalPages = Math.ceil(result.length / limit);
+    // Calcular paginación
+    const totalPages = Math.ceil(filteredProducts.length / limit);
     const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
+    const endIndex = Math.min(startIndex + limit, filteredProducts.length);
 
-    // Obtener los productos para la página actual
-    const limitedProducts = result.slice(startIndex, endIndex);
+    // Obtener productos para la página actual
+    const limitedProducts = filteredProducts.slice(startIndex, endIndex);
 
+    // Construir enlaces de paginación
+    const prevLink = page > 1 ? `/productos?page=${page - 1}&limit=${limit}` : null;
+    const nextLink = page < totalPages ? `/productos?page=${page + 1}&limit=${limit}` : null;
+
+    // Construir objeto de respuesta con información de paginación
     const response = {
       status: 'success',
       payload: limitedProducts,
-      totalPages: totalPages,
-      prevPage: page > 1 ? page - 1 : null,
-      nextPage: page < totalPages ? page + 1 : null,
-      page: page,
-      hasPrevPage: page > 1,
-      hasNextPage: page < totalPages,
-      prevLink: page > 1 ? `/productos?page=${page - 1}&limit=${limit}` : null,
-      nextLink: page < totalPages ? `/productos?page=${page + 1}&limit=${limit}` : null
+      pagination: {
+        totalPages: totalPages,
+        currentPage: page,
+        hasPrevPage: page > 1,
+        hasNextPage: page < totalPages,
+        prevLink: prevLink,
+        nextLink: nextLink
+      }
     };
 
     res.json(response);
@@ -72,7 +82,6 @@ productsRouter.get('/', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener los productos' });
   }
 });
-
 
 //Metodo GET/:pid y confirmando si hay stock!
 productsRouter.get('/:pid', async (req, res) => {
@@ -96,7 +105,6 @@ productsRouter.get('/:pid', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener el producto' });
   }
 });
-
 
 //Metodo POST
 productsRouter.post('/', async (req, res) => {
@@ -150,7 +158,6 @@ productsRouter.delete('/:pid', async (req, res) => {
     return res.status(500).json({ status: 'error', error: 'Failed to delete product' });
   }
 });
-
 
 module.exports = productsRouter
 

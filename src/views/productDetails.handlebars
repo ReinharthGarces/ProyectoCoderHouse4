@@ -1,14 +1,15 @@
 <!-- productDetails.handlebars -->
-<div class="product">
-  <h2>{{this.name}}</h2>
-  <p>Descripción: {{this.description}}</p>
-  <p>Precio: {{this.price}}</p>
-  <p>Categoría: {{this.category}}</p>
-  <form action="/carts/{{cartId}}/products/{{this._id}}" method="post">
-    <button type="submit">Agregar al carrito</button>
+
+<div class="product" {{product}}>
+  <h2>{{product.name}}</h2>
+  <p>Descripción: {{product.description}}</p>
+  <p>Precio: {{product.price}}</p>
+  <p>Categoría: {{product.category}}</p>
+  <form id="aggCarrito" action="/api/carts/" method="post">
+    <button type="submit" class="addToCartButton">Agregar al carrito</button>
+    <input type="hidden" name="productId" value="{{product._id}}">
   </form>
 </div>
-
 
 
 <script src="/socket.io/socket.io.js"></script>

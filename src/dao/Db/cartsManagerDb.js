@@ -13,9 +13,9 @@ async function getAllCarts() {
   }
 }
 
-async function createCart(_id) {
+async function createCart() {
   try {
-    const cart = await cartModel.create(_id);
+    const cart = await cartModel.create({ products: [] });
     console.log('Carrito creado:', cart)
     return cart._id
   } catch (error) {

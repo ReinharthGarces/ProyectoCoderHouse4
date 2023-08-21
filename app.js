@@ -34,10 +34,10 @@ app.set('views', './src/views');
 app.set('view engine', 'handlebars');
 
 // Middleware a nivel aplicación
-app.use((req, res, next) => {
-  console.log('Middleware a nivel aplicación');
-  return next();
-});
+// app.use((req, res, next) => {
+//   console.log('Middleware a nivel aplicación');
+//   return next();
+// });
 
 async function connectToDatabase() {
   try {

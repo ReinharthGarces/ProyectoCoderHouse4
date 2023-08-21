@@ -21,6 +21,7 @@
     <th>Stock:</th>
     <th>Category:</th>
     <th>Thumbnail:</th>
+    <th>Delete:</th>
   </tr>
   {{#each products}}
     <tr>
@@ -37,9 +38,16 @@
       </td>
     </tr>
   {{/each}}
-  
 </table>
 
+<div class="pagination">
+  {{#if pagination.hasPrevPage}}
+    <a href="{{pagination.prevLink}}">Previous</a>
+  {{/if}}
+  {{#if pagination.hasNextPage}}
+    <a href="{{pagination.nextLink}}">Next</a>
+  {{/if}}
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/realTimeProducts.js"></script>

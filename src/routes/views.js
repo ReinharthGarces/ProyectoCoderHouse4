@@ -2,6 +2,8 @@ const { Router } = require('express')
 const viewsRouter = Router()
 const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
 const { getAllCarts, createCart, getCartById, updateCartById, deleteCartById } = require('../dao/Db/cartsManagerDb')
+const productModel = require('../dao/models/productModel')
+
 // const ProductManager = require('../dao/Fs/ProductManager')
 // const manager = new ProductManager('./src/json/products.json')
 
@@ -61,25 +63,32 @@ viewsRouter.get('/products/:pid', async (req, res) => {
   const productId = req.params.pid;
   const product = await getProductById(productId);
   console.log(product);
-  // const product = productFromDB.toObject())
-  // console.log(`productos transformados ${product}`);
-  // console.log(product);
-  return res.render('productDetails', { title: 'ReinharthApp-ProductDetails', style: 'productDetails.css',  product: product });
+  return res.render('productDetails', { title: 'ReinharthApp-ProductDetails', style: 'productDetails.css',  product: product.toObject() });
 });
 
 //Vista cartDetails.handlebars
 viewsRouter.get('/carts/:cid', async (req, res) => {
   const cartId = req.params.cid;
   const cart = await getCartById(cartId);
+
   if (!cart) {
     return res.status(404).json({ error: 'Carrito no encontrado' });
   }
+
   const productsWithQuantity = cart.products.map(product => ({
-    _id: product._id,
+    _id: product.productId,
     quantity: product.quantity
   }));
-  return res.render('cartDetails', { title: 'ReinharthApp-CartDetails', style: 'cartDetails.css', cartId: cart._id, products: productsWithQuantity });
-});
 
+  const populatedProducts = await Promise.all(productsWithQuantity.map(async product => {
+    const populatedProduct = await productModel.findById(product._id);
+    return {
+      product: populatedProduct.toObject(),
+      quantity: product.quantity
+    };
+  }));
+
+  return res.render('cartDetails', {title: 'ReinharthApp-CartDetails', style:'cartDetails.css', cartId: cart._id, products: populatedProducts});
+});
 
 module.exports = viewsRouter

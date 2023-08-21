@@ -5,11 +5,32 @@
 <ul>
   {{#each products}}
     <li>
-      Producto ID: {{ this._id }}
-      Cantidad: {{ this.quantity }}
+      <div class="product-info">
+        <div class="product-property">
+          <span class="property-title">Producto ID:</span>
+          <span class="property-value">{{ this.product._id }}</span>
+        </div>
+        <div class="product-property">
+          <span class="property-title">Nombre:</span>
+          <span class="property-value">{{ this.product.name }}</span>
+        </div>
+        <div class="product-property">
+          <span class="property-title">Precio:</span>
+          <span class="property-value">{{ this.product.price }}</span>
+        </div>
+        <div class="product-property">
+          <span class="property-title">Categoría:</span>
+          <span class="property-value">{{ this.product.category }}</span>
+        </div>
+        <div class="product-property">
+          <span class="property-title">Cantidad:</span>
+          <span class="property-value">{{ this.quantity }}</span>
+        </div>
+      </div>
     </li>
   {{/each}}
 </ul>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/cartDetails.js"></script>
