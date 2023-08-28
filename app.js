@@ -2,17 +2,19 @@ console.clear();
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
 const handlebars = require('express-handlebars');
+// const GitHubStrategy = require('passport-github2');
 const productsRouter = require('./src/routes/products');
 const cartsRouter = require('./src/routes/carts');
 const viewsRouter = require('./src/routes/views');
+const sessionRouter = require('./src/routes/sessions');
 const ProductManager = require('./src/dao/Fs/ProductManager');
 const manager = new ProductManager('./src/json/products.json');
-const { Server } = require('socket.io');
 const { saveMessage , getAllMessages } = require('./src/dao/Db/messageManagerDb')
-
+const { Server } = require('socket.io');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const mongoStore = require('connect-mongo');
 require('dotenv').config();
 
 // Configuro mi servidor
@@ -20,25 +22,32 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+//Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use(cookieParser('secretkey'));
+app.use(cookieParser('signed'));
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/', viewsRouter);
+app.use(session({
+  store: mongoStore.create({
+    mongoUrl: process.env.MONGODB_CONNECT,
+    mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
+    ttl:150,
+  }),
+  secret: 'secretKey',
+  resave: false,
+  saveUninitialized: false,
+}))
+app.use('/api/session', sessionRouter);
 
 // Configuro motor de plantillas de handlebars
 app.engine('handlebars', handlebars.engine());
 app.set('views', './src/views');
 app.set('view engine', 'handlebars');
 
-// Middleware a nivel aplicación
-// app.use((req, res, next) => {
-//   console.log('Middleware a nivel aplicación');
-//   return next();
-// });
-
+// Configuro mi base de datos
 async function connectToDatabase() {
   try {
     const MONGODB_CONNECT = process.env.MONGODB_CONNECT;
@@ -94,3 +103,24 @@ io.on('connection', (socket) => {
 connectToDatabase();
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log(`Servidor arriba desde puerto ${PORT}`));
+
+//Testing Cookies
+app.get('/setCookie', (req, res) => { 
+  res.cookie('testCookie', 'Probando Cookies', { maxAge: 10000 }).send('Cookie Creada')
+})
+//Obtener Cookies
+app.get('/getCookies', (req, res) => { 
+  res.send(req.cookies)
+})
+//Eliminar Cookies
+app.get('/deleteCookie', (req, res) => {
+  res.clearCookie('testCookie').send('Cookie Eliminada')
+})
+//Cookies firmada
+app.get('/setSignedCookie', (req, res) => {
+  res.cookie('signedCookie', 'Probando Cookies Firmadas', { signed: true }).send('Cookie Creada')
+})
+//Obtener Cookies Firmadas
+app.get('/getSignedCookies', (req, res) => { 
+  res.send(req.signedCookies)
+})

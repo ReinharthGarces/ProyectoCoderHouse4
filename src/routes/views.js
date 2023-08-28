@@ -3,7 +3,7 @@ const viewsRouter = Router()
 const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
 const { getAllCarts, createCart, getCartById, updateCartById, deleteCartById } = require('../dao/Db/cartsManagerDb')
 const productModel = require('../dao/models/productModel')
-
+const userModel = require('../dao/models/userModel')
 // const ProductManager = require('../dao/Fs/ProductManager')
 // const manager = new ProductManager('./src/json/products.json')
 
@@ -51,11 +51,15 @@ viewsRouter.get('/chat', async (req,res) => {
 
 //Vista products.handlebars
 viewsRouter.get('/products', async (req, res) => {
-  // Obtener la lista de productos con paginación (puedes usar una librería como "mongoose-paginate")
-  const productsFromDB =  await getAllProducts()
-  const products = productsFromDB.map(product => product.toObject())
+  try {
+    // Obtener la lista de productos con paginación (puedes usar una librería como "mongoose-paginate")
+    const productsFromDB = await getAllProducts();
+    const products = productsFromDB.map(product => product.toObject());
 
-  return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products });
+    return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products});
+  } catch (error) {
+    return res.status(500).json({ error: 'Error en el servidor' });
+  }
 });
 
 //Vista productsDetails.handlebars
@@ -89,6 +93,44 @@ viewsRouter.get('/carts/:cid', async (req, res) => {
   }));
 
   return res.render('cartDetails', {title: 'ReinharthApp-CartDetails', style:'cartDetails.css', cartId: cart._id, products: populatedProducts});
+});
+
+//Middleware para que no se pueda acceder a la vista profile si no está logueado
+const sessionMiddleware = (req, res, next) => {
+  if (req.url === '/profile' && !req.session.user) {
+    return res.redirect('/login'); 
+  }
+  next(); 
+};
+
+// Rutas de registro y inicio de sesión
+viewsRouter.get('/register', sessionMiddleware, (req, res) => {
+  return res.render('register', { title: 'ReinharthApp-Register', style: 'register.css' });
+});
+
+viewsRouter.get('/login', sessionMiddleware, (req, res) => {
+
+  return res.render('login', { title: 'ReinharthApp-Login', style: 'login.css' });
+});
+
+viewsRouter.get('/profile', (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect('/login');
+    }
+
+    const user = req.session.user;
+    console.log(user + 'este es el usuario')
+    const configuracion = {
+      title: 'ReinharthApp-Profile',
+      style: 'profile.css'
+    };
+
+    return res.render('profile', { ...configuracion, user });
+  } catch (error) {
+    console.error(error); 
+    return res.status(500).json({ error: 'Error en el servidor' });
+  }
 });
 
 module.exports = viewsRouter

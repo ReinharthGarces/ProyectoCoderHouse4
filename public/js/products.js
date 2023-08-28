@@ -39,3 +39,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addToCart = addToCart;
 });
+
+console.log(user)
