@@ -55,8 +55,9 @@ viewsRouter.get('/products', async (req, res) => {
     // Obtener la lista de productos con paginación (puedes usar una librería como "mongoose-paginate")
     const productsFromDB = await getAllProducts();
     const products = productsFromDB.map(product => product.toObject());
+    const user = req.session.user
 
-    return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products});
+    return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products, user: user});
   } catch (error) {
     return res.status(500).json({ error: 'Error en el servidor' });
   }
@@ -97,10 +98,20 @@ viewsRouter.get('/carts/:cid', async (req, res) => {
 
 //Middleware para que no se pueda acceder a la vista profile si no está logueado
 const sessionMiddleware = (req, res, next) => {
-  if (req.url === '/profile' && !req.session.user) {
-    return res.redirect('/login'); 
+  if (req.session.user) {
+    return res.redirect('/profile')
   }
-  next(); 
+  return next()
+}
+//Middleware para verificar el role del usuario
+const checkUserRole = (role) => {
+  return (req, res, next) => {
+    if (req.session.user && req.session.user.role === role) {
+      return next();
+    } else {
+      return res.status(403).json({ error: 'Acceso denegado' });
+    }
+  };
 };
 
 // Rutas de registro y inicio de sesión
@@ -109,7 +120,6 @@ viewsRouter.get('/register', sessionMiddleware, (req, res) => {
 });
 
 viewsRouter.get('/login', sessionMiddleware, (req, res) => {
-
   return res.render('login', { title: 'ReinharthApp-Login', style: 'login.css' });
 });
 
@@ -131,6 +141,19 @@ viewsRouter.get('/profile', (req, res) => {
     console.error(error); 
     return res.status(500).json({ error: 'Error en el servidor' });
   }
+});
+
+viewsRouter.post('/logout', (req, res) => {
+  req.session.destroy(); 
+  return res.redirect('/login'); 
+});
+
+// Ruta que solo permite el acceso a administradores
+viewsRouter.get('/admin/dashboard', checkUserRole('admin'), (req, res) => {
+  return res.render('admin_dashboard', {
+    title: 'Panel de Administración',
+    style: 'admin.css'
+  });
 });
 
 module.exports = viewsRouter

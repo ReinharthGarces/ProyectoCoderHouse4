@@ -4,22 +4,30 @@ const userModel = require('../dao/models/userModel')
 
 //Metodo GET 
 sessionRouter.get('/', async (req, res) => {
+  console.log('get', req.session);
   return res.json(req.session);
-  console.log(req.session);
-  if (!req.session.counter) {
-    req.session.counter = 1;
-    req.session.name = req.query.name;
-    return res.json(`Bienvenido ${req.session.name}`);
-  } else {
-    req.session.counter++;
-    return res.json(`${req.session.name} has visitado la página ${req.session.counter} veces`);
-  }
+  // if (!req.session.counter) {
+  //   req.session.counter = 1;
+  //   req.session.name = req.query.name;
+  //   return res.json(`Bienvenido ${req.session.name}`);
+  // } else {
+  //   req.session.counter++;
+  //   return res.json(`${req.session.name} has visitado la página ${req.session.counter} veces`);
+  // }
 })
 
-//Metodo POST para register
+// Método POST para register
 sessionRouter.post('/register', async (req, res) => {
   try {
-    const user = await userModel.create(req.body);
+    let user = await userModel.create(req.body);
+    if (user.email === 'adminCoder@coder.com' && user.password === 'adminCod3r123') {
+      user.role = 'admin';
+    } else {
+      user.role = 'usuario'; 
+    }
+
+    user = await user.save();
+
     console.log(user);
     return res.redirect('/login');
   } catch (error) {
@@ -27,24 +35,23 @@ sessionRouter.post('/register', async (req, res) => {
   }
 });
 
-//Metodo POST para login
+// Método POST para login
 sessionRouter.post('/login', async (req, res) => {
   try {
     let user = await userModel.findOne({ email: req.body.email });
-    console.log(user);
-    if (!user) {
-      return res.status(401).json({ error: 'El usuario no existe en el sistema' });
+    if (!user || user.password !== req.body.password) {
+      return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
-    
-    if (user.password !== req.body.password) {
-      return res.status(401).json({ error: 'Datos incorrectos' });
+
+    user = user.toObject();
+    delete user.password;
+    req.session.user = user;
+
+    if (user.role === 'admin') {
+      return res.redirect('/admin/dashboard'); 
+    } else {
+      return res.redirect('/products'); 
     }
-    
-    user = user.toObject()
-    delete user.password
-    req.session.user = user
-    
-    return res.redirect('/profile');
   } catch (error) {
     return res.status(500).json({ error: 'Error en el servidor' });
   }

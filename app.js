@@ -23,13 +23,6 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 //Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
-app.use(cookieParser('signed'));
-app.use('/api/products', productsRouter);
-app.use('/api/carts', cartsRouter);
-app.use('/', viewsRouter);
 app.use(session({
   store: mongoStore.create({
     mongoUrl: process.env.MONGODB_CONNECT,
@@ -40,6 +33,13 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(cookieParser('signed'));
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/', viewsRouter);
 app.use('/api/session', sessionRouter);
 
 // Configuro motor de plantillas de handlebars
