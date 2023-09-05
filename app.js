@@ -3,7 +3,6 @@ const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
 const handlebars = require('express-handlebars');
-// const GitHubStrategy = require('passport-github2');
 const productsRouter = require('./src/routes/products');
 const cartsRouter = require('./src/routes/carts');
 const viewsRouter = require('./src/routes/views');
@@ -15,6 +14,10 @@ const { Server } = require('socket.io');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const mongoStore = require('connect-mongo');
+const cors = require('cors');
+const passport = require('passport');
+const initializePassport = require('./src/config/passport.config');
+const GitHubStrategy = require('passport-github2');
 require('dotenv').config();
 
 // Configuro mi servidor
@@ -33,14 +36,18 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }))
+initializePassport()
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser('signed'));
+app.use(cors())
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
-app.use('/', viewsRouter);
 app.use('/api/session', sessionRouter);
+app.use('/', viewsRouter);
 
 // Configuro motor de plantillas de handlebars
 app.engine('handlebars', handlebars.engine());

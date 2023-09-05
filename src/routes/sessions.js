@@ -1,10 +1,12 @@
 const { Router } = require('express')
+const passport = require('passport')
+const { createHash } = require('../utils/passwordHash')
 const sessionRouter = Router()
 const userModel = require('../dao/models/userModel')
 
 //Metodo GET 
 sessionRouter.get('/', async (req, res) => {
-  console.log('get', req.session);
+  console.log('get', req.user);
   return res.json(req.session);
   // if (!req.session.counter) {
   //   req.session.counter = 1;
@@ -17,18 +19,19 @@ sessionRouter.get('/', async (req, res) => {
 })
 
 // Método POST para register
-sessionRouter.post('/register', async (req, res) => {
+sessionRouter.post('/register', 
+passport.authenticate('register', { failureRedirect:'/failregister' }),
+async (req, res) => {
   try {
-    let user = await userModel.create(req.body);
-    if (user.email === 'adminCoder@coder.com' && user.password === 'adminCod3r123') {
+    console.log(req.user , 'register')
+    let user = req.user;
+    if (user.email === 'adminCoder@coder.com') {
       user.role = 'admin';
     } else {
       user.role = 'usuario'; 
     }
 
     user = await user.save();
-
-    console.log(user);
     return res.redirect('/login');
   } catch (error) {
     return res.status(500).json({ error: 'Error en el servidor' });
@@ -36,26 +39,62 @@ sessionRouter.post('/register', async (req, res) => {
 });
 
 // Método POST para login
-sessionRouter.post('/login', async (req, res) => {
-  try {
-    let user = await userModel.findOne({ email: req.body.email });
-    if (!user || user.password !== req.body.password) {
-      return res.status(401).json({ error: 'Credenciales incorrectas' });
+sessionRouter.post('/login',
+  passport.authenticate('login',
+  { failureRedirect: '/faillogin' }),
+  (req, res) => {
+    try {
+      const user = req.user;
+      console.log(user, 'login');
+      if (user.role === 'admin') {
+        return res.redirect('/admin/dashboard');
+      } else {
+        return res.redirect('/products');
+      }
+    } catch (error) {
+      return res.status(500).json({ error: 'Error en el servidor' });
     }
-
-    user = user.toObject();
-    delete user.password;
-    req.session.user = user;
-
-    if (user.role === 'admin') {
-      return res.redirect('/admin/dashboard'); 
-    } else {
-      return res.redirect('/products'); 
-    }
-  } catch (error) {
-    return res.status(500).json({ error: 'Error en el servidor' });
   }
-});
+);
 
+//Metodo POST para recuperar password
+sessionRouter.post('/recovery_password', async (req, res) => {
+  try {
+    let user = await userModel.findOne({ email: req.body.email })
+    if (!user) {
+      return res.status(401).json({
+        error: 'El usuario no existe en el sistema'
+      })
+    }
+
+    const newPassword = createHash(req.body.password)
+    await userModel.updateOne({ email: user.email }, { password: newPassword })  
+    return res.redirect('/login')
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Error en el servidor' })
+  }
+})
+
+//Metodos GET para registro y login fallidos
+sessionRouter.get('/failregister', (req, res) => {
+  return res.json({
+    error: 'Error al registrarse'
+  })
+})
+
+sessionRouter.get('/faillogin', (req, res) => {
+  return res.json({
+    error: 'Error al iniciar sesión'
+  })
+})
+
+//Routes for github
+sessionRouter.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => {
+})
+
+sessionRouter.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login'}), async (req, res) => {
+  return res.redirect('/products');
+})
 module.exports = sessionRouter
 

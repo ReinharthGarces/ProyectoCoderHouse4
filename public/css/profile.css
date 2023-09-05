@@ -1,0 +1,36 @@
+/* Estilos generales para el perfil de usuario */
+.profile-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #e1e1e1;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Estilos para los campos del perfil */
+.profile-field {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+/* Estilos para el botón de cierre de sesión */
+.logout-button {
+  background-color: #d9534f;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #c9302c;
+}
+
+.logout-button:focus {
+  outline: none;
+}

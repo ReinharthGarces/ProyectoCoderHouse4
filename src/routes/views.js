@@ -1,4 +1,5 @@
 const { Router } = require('express')
+const passport = require('passport')
 const viewsRouter = Router()
 const { getAllProducts, createProduct, getProductById, updateProductById, deleteProductById } = require('../dao/Db/productManagerDb')
 const { getAllCarts, createCart, getCartById, updateCartById, deleteCartById } = require('../dao/Db/cartsManagerDb')
@@ -55,9 +56,9 @@ viewsRouter.get('/products', async (req, res) => {
     // Obtener la lista de productos con paginación (puedes usar una librería como "mongoose-paginate")
     const productsFromDB = await getAllProducts();
     const products = productsFromDB.map(product => product.toObject());
-    const user = req.session.user
+    const user = req.user
 
-    return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products, user: user});
+    return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products, user: user.toObject()});
   } catch (error) {
     return res.status(500).json({ error: 'Error en el servidor' });
   }
@@ -106,7 +107,7 @@ const sessionMiddleware = (req, res, next) => {
 //Middleware para verificar el role del usuario
 const checkUserRole = (role) => {
   return (req, res, next) => {
-    if (req.session.user && req.session.user.role === role) {
+    if (req.user && req.user.role === role) {
       return next();
     } else {
       return res.status(403).json({ error: 'Acceso denegado' });
@@ -125,18 +126,17 @@ viewsRouter.get('/login', sessionMiddleware, (req, res) => {
 
 viewsRouter.get('/profile', (req, res) => {
   try {
-    if (!req.session.user) {
+    if (!req.user) {
       return res.redirect('/login');
     }
 
-    const user = req.session.user;
-    console.log(user + 'este es el usuario')
+    const user = req.user;
     const configuracion = {
       title: 'ReinharthApp-Profile',
       style: 'profile.css'
     };
 
-    return res.render('profile', { ...configuracion, user });
+    return res.render('profile', { ...configuracion, user:user.toObject() });
   } catch (error) {
     console.error(error); 
     return res.status(500).json({ error: 'Error en el servidor' });
@@ -155,5 +155,10 @@ viewsRouter.get('/admin/dashboard', checkUserRole('admin'), (req, res) => {
     style: 'admin.css'
   });
 });
+
+//Vista para recovery_password.handlebars
+viewsRouter.get('/recovery_password', (req, res) => {
+  return res.render('recovery_password', { title: 'ReinharthApp-RecoveryPassword', style: 'recovery_password.css' });
+})
 
 module.exports = viewsRouter
