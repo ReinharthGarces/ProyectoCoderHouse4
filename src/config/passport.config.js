@@ -1,10 +1,13 @@
 const passport = require('passport')
 const passportLocal = require('passport-local')
 const userModel = require('../dao/models/userModel')
+const cartModel = require('../dao/models/cartModel')
 const { createHash, isValidPassword } = require('../utils/passwordHash')
+const { createCart, getCartById, getAllCarts } = require('../dao/Db/cartsManagerDb')
 const GitHubStrategy = require('passport-github2');
 const LocalStrategy = passportLocal.Strategy
-// require('dotenv').config();
+const flash = require('connect-flash');
+
 
 const initializePassport = () => {
   passport.use('github', new GitHubStrategy({
@@ -40,7 +43,7 @@ const initializePassport = () => {
         const user = await userModel.findOne({ email: username })
   
         if (user) {
-          console.log('Usuario ya existe')
+          console.log('email ya registrado')
           return done(null, false)
         }  
 
@@ -75,7 +78,12 @@ const initializePassport = () => {
         user = user.toObject()
         delete user.password
 
-        done(null, user)
+        if (!user.cart) {
+          const newCart = await createCart();
+          await userModel.updateOne({ _id: user._id }, { cart: newCart._id });
+        }
+
+        return done(null, user)
       } catch (e) {
         return done(e)
       }
@@ -93,7 +101,7 @@ const initializePassport = () => {
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await userModel.findById(id);
+      const user = await userModel.findById(id).populate('cart');
       done(null, user);
     } catch (error) {
       done(error);
@@ -102,5 +110,3 @@ const initializePassport = () => {
 }
 
 module.exports = initializePassport
-
-

@@ -20,15 +20,17 @@ sessionRouter.get('/', async (req, res) => {
 
 // Método POST para register
 sessionRouter.post('/register', 
-passport.authenticate('register', { failureRedirect:'/failregister' }),
-async (req, res) => {
+  passport.authenticate('register',
+    { failureRedirect:'/failregister',
+    failureFlash: true }),
+  async (req, res) => {
   try {
     console.log(req.user , 'register')
     let user = req.user;
     if (user.email === 'adminCoder@coder.com') {
       user.role = 'admin';
     } else {
-      user.role = 'usuario'; 
+      user.role = 'user'; 
     }
 
     user = await user.save();
@@ -41,7 +43,8 @@ async (req, res) => {
 // Método POST para login
 sessionRouter.post('/login',
   passport.authenticate('login',
-  { failureRedirect: '/faillogin' }),
+  { failureRedirect: '/faillogin',
+    failureFlash: true}),
   (req, res) => {
     try {
       const user = req.user;
@@ -96,5 +99,12 @@ sessionRouter.get('/github', passport.authenticate('github', { scope: ['user:ema
 sessionRouter.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login'}), async (req, res) => {
   return res.redirect('/products');
 })
+
+sessionRouter.get('/current', (req, res) => {
+  return res.json({
+    user:req.user,
+    session:req.session});
+})
+
 module.exports = sessionRouter
 

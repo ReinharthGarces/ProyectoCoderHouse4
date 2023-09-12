@@ -18,6 +18,7 @@ const cors = require('cors');
 const passport = require('passport');
 const initializePassport = require('./src/config/passport.config');
 const GitHubStrategy = require('passport-github2');
+const flash = require('connect-flash');
 require('dotenv').config();
 
 // Configuro mi servidor
@@ -44,6 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser('signed'));
 app.use(cors())
+app.use(flash());
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/session', sessionRouter);

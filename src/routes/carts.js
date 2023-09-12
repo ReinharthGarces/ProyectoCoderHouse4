@@ -1,18 +1,9 @@
 const { Router } = require('express')
-const fs = require('fs')
 const cartsRouter = Router()
-const CartManager = require('../dao/Fs/cartManager')
 const cartModel = require('../dao/models/cartModel')
 const productModel = require('../dao/models/productModel')
 const mongoose = require('mongoose')
-// const manager = new CartManager('./src/json/carts.json')
 const { createCart, getCartById, getAllCarts } = require('../dao/Db/cartsManagerDb')
-
-//Probando Middleware 
-// cartsRouter.use((req,res,next) =>{
-//   console.log('Middleware en cartsRouter')
-//   return next()
-// })
 
 //Metodo POST
 cartsRouter.post('/', async (req, res) => {

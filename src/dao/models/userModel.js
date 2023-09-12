@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { Schema, model } = require('mongoose')
 
 const userSchema = Schema({
@@ -5,11 +6,14 @@ const userSchema = Schema({
   lastname: String,
   email: {
     type: String,
-    // unique: true
+    unique: true
   },
   age: Number,
   password: String,
-  createdAt: Date,
+  cart: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'carts', 
+  },
   role: String
 })
 
