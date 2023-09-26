@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate-v2');
+// const mongoosePaginate = require('mongoose-paginate-v2');
 
 const cartSchema = mongoose.Schema({
   products: [{
@@ -14,7 +14,7 @@ const cartSchema = mongoose.Schema({
     },
   }]
 });
-  cartSchema.plugin(mongoosePaginate);
+  // cartSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('carts', cartSchema);
 

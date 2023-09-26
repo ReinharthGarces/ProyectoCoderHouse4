@@ -7,8 +7,6 @@ const productsRouter = require('./src/routes/products');
 const cartsRouter = require('./src/routes/carts');
 const viewsRouter = require('./src/routes/views');
 const sessionRouter = require('./src/routes/sessions');
-const ProductManager = require('./src/dao/Fs/ProductManager');
-const manager = new ProductManager('./src/json/products.json');
 const { saveMessage , getAllMessages } = require('./src/dao/Db/messageManagerDb')
 const { Server } = require('socket.io');
 const cookieParser = require('cookie-parser');
@@ -40,11 +38,11 @@ app.use(session({
 initializePassport()
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser('signed'));
-app.use(cors())
 app.use(flash());
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
@@ -102,7 +100,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    const user = socket.user;
+    const user = socket.id;
     console.log(`${user} se ha desconectado`);
   });
   io.emit('Mensaje Back-end', 'Mensaje enviado desde Back-end');
@@ -110,7 +108,7 @@ io.on('connection', (socket) => {
 
 //Inicializo servidor
 connectToDatabase();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 server.listen(PORT, () => console.log(`Servidor arriba desde puerto ${PORT}`));
 
 //Testing Cookies
