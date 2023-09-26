@@ -49,11 +49,15 @@ viewsRouter.get('/chat', async (req,res) => {
 //Vista products.handlebars
 viewsRouter.get('/products', async (req, res) => {
   try {
+    const user = req.user
     const productsFromDB = await productsManager.getAllProducts();
     const products = productsFromDB.map(product => product.toObject());
-    const user = req.user
-    console.log(products)
-    return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products, user: user.toObject()});
+    
+    if (!user) {
+      return res.redirect('/login')
+    } else {
+      return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products, user: user.toObject()});
+    }
   } catch (error) {
     return res.status(500).json({ error: 'Error en el servidor' });
   }
