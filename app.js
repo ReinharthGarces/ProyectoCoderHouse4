@@ -7,7 +7,7 @@ const productsRouter = require('./src/routes/products');
 const cartsRouter = require('./src/routes/carts');
 const viewsRouter = require('./src/routes/views');
 const sessionRouter = require('./src/routes/sessions');
-const { saveMessage , getAllMessages } = require('./src/dao/Db/messageManagerDb')
+const { saveMessage , getAllMessages } = require('./src/dao/Db/messagesManagerDb')
 const { Server } = require('socket.io');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -17,6 +17,8 @@ const passport = require('passport');
 const initializePassport = require('./src/config/passport.config');
 const GitHubStrategy = require('passport-github2');
 const flash = require('connect-flash');
+const nodemailer = require('nodemailer')
+const twilio = require('twilio');
 require('dotenv').config();
 
 // Configuro mi servidor
@@ -29,7 +31,7 @@ app.use(session({
   store: mongoStore.create({
     mongoUrl: process.env.MONGODB_CONNECT,
     mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
-    ttl:150,
+    ttl:1000,
   }),
   secret: 'secretKey',
   resave: false,
@@ -130,4 +132,44 @@ app.get('/setSignedCookie', (req, res) => {
 //Obtener Cookies Firmadas
 app.get('/getSignedCookies', (req, res) => { 
   res.send(req.signedCookies)
+})
+
+//Config transporter y GET para el envio del mail y SMS
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  port: 587,
+  auth: {
+    user: process.env.NODEMAILER_USER_EMAIL,
+    pass: process.env.NODEMAILER_USER_PASSWORD
+  }
+})
+
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+app.get('/mail', async (req, res) => {
+  let result = await transporter.sendMail({
+    from: process.env.NODEMAILER_USER_EMAIL,
+    to: 'reinharth_26@hotmail.com',
+    subject: 'Test Email',
+    html: `
+      <div>
+        <h1>Esto es un test de email!!!</h1>
+        <img src="cid:test" alt="Logo Carrito">
+      </div>`,
+    attachments: [{
+      filename: 'logoCarrito.png',
+      path: './public/img/logoCarrito.png',
+      cid: 'test'
+    }]
+  });
+  res.send({ status: 'success', message: 'Email enviado' });
+});
+
+app.get('/sms', async (req, res) => {
+  let result = await client.messages.create({
+    body:'Esto es un test de SMS!!!',
+    from: process.env.TWILIO_SMS_NUMBER,
+    to: '+541123915928'
+  })
+  res.send({ status: 'success', message: 'SMS enviado' })
 })

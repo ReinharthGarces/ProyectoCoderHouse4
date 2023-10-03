@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const passport = require('passport')
+const { authToken } = require('../utils/jwt')
 const UsersController = require('../controllers/usersControllers')
 
 const sessionRouter = new Router()
@@ -15,6 +16,6 @@ sessionRouter.get('/failregister', usersController.failRegister.bind(usersContro
 sessionRouter.get('/faillogin', usersController.failLogin.bind(usersController))
 sessionRouter.get('/github', passport.authenticate('github', { scope: ['user:email'] }), usersController.github.bind(usersController))
 sessionRouter.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login'}), usersController.githubCallback.bind(usersController))
-sessionRouter.get('/current', usersController.current.bind(usersController))
+sessionRouter.get('/current', authToken, usersController.current.bind(usersController))
 
 module.exports = sessionRouter

@@ -1,11 +1,13 @@
 const passport = require('passport')
 const passportLocal = require('passport-local')
 const userModel = require('../dao/models/userModel')
-const cartModel = require('../dao/models/cartModel')
 const { createHash, isValidPassword } = require('../utils/passwordHash')
-const { createCart, getCartById, getAllCarts } = require('../dao/Db/cartsManagerDb')
+const CartsManager = require('../dao/Db/cartsManagerDb')
+// const CartsManager = require('../dao/fs/cartsManager')
+const cartsManager = new CartsManager()
 const GitHubStrategy = require('passport-github2');
 const LocalStrategy = passportLocal.Strategy
+const { generateToken } = require('../utils/jwt')
 const flash = require('connect-flash');
 
 
@@ -78,8 +80,11 @@ const initializePassport = () => {
         user = user.toObject()
         delete user.password
 
+        const token = generateToken(user)
+        user.token = token
+
         if (!user.cart) {
-          const newCart = await createCart();
+          const newCart = await cartsManager.createCart();
           await userModel.updateOne({ _id: user._id }, { cart: newCart._id });
         }
 

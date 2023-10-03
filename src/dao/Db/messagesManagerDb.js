@@ -22,7 +22,4 @@ async function getAllMessages() {
   }
 }
 
-module.exports = {
-  saveMessage,
-  getAllMessages,
-};
+module.exports = { saveMessage, getAllMessages };

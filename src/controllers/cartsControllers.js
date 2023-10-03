@@ -1,11 +1,18 @@
+// const CartsManager = require('../dao/fs/cartsManager')
+// const ProductsManager = require('../dao/fs/productsManager')
+const ProductsManager = require('../dao/Db/productsManagerDb')
 const CartsManager = require('../dao/Db/cartsManagerDb')
+const TicketsManager = require('../dao/Db/ticketsManagerDb')
+const CartDTO = require('../dto/cartsManagerDTO')
 const mongoose = require('mongoose')
 const productModel = require('../dao/models/productModel')
-
+const userModel = require('../dao/models/userModel')
 
 class CartsController {
   constructor () {
     this.controller = new CartsManager()
+    this.ticketsController = new TicketsManager()
+    this.ProductsController = new ProductsManager()
   }
 
   async createCart (req, res) {
@@ -125,7 +132,7 @@ class CartsController {
   async updatedCartById (req, res) {
     const cid = req.params.cid;
     const updatedProducts = req.body.products;
-  
+    
     try {
       const cartId = new mongoose.Types.ObjectId(cid);
       const cart = await this.controller.getCartById({ _id: cartId });
@@ -221,6 +228,68 @@ class CartsController {
       return res.status(500).json({ error: 'Error al eliminar productos del carrito' });
     }
   }
+
+  async getCartByIdAndPurchase(req, res) {
+    const cid = req.params.cid;
+    try {
+      const cart = await this.controller.getCartById(cid);
+      if (!cart) {
+        return res.status(404).json({ error: 'Carrito no encontrado' });
+      }
+  
+      const user = await userModel.findOne({ cart: cart._id });
+      if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+  
+      const productosNoProcesados = [];
+      let totalAmount = 0; 
+  
+      for (const cartProduct of cart.products) {
+        const productId = cartProduct.productId;
+        const quantityInCart = cartProduct.quantity;
+  
+        const product = await productModel.findById(productId);
+  
+        if (!product) {
+          return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+  
+        const productTotal = product.price * quantityInCart;
+        totalAmount += productTotal;
+  
+        if (product.stock >= quantityInCart) {
+          product.stock -= quantityInCart;
+          await product.save();
+        } else {
+          productosNoProcesados.push(productId);
+        }
+      }
+  
+      // cart.purchased = true;
+      await cart.save();
+      
+      const infoTicket = await this.ticketsController.generateTicket( user.email, totalAmount );
+      console.log('infoTicket', infoTicket)
+  
+      cart.products = cart.products.filter((cartProduct) =>
+        !productosNoProcesados.includes(cartProduct.productId.toString())
+      );
+      await cart.save();
+  
+      if (productosNoProcesados.length > 0) {
+        return res.status(200).json({
+          message: 'Compra finalizada con algunos productos no procesados',
+          productosNoProcesados,
+        });
+      } else {
+        return res.status(200).json({ message: 'Compra finalizada con éxito' });
+      }
+    } catch (error) {
+      console.error('Error al finalizar la compra', error);
+      return res.status(500).json({ error: 'Error al finalizar la compra' });
+    }
+  }  
 }
 
 module.exports = CartsController;

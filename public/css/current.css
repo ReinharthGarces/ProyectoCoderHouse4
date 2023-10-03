@@ -1,0 +1,29 @@
+
+.current-container {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  margin: 20px;
+}
+
+.current-container h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.current-field {
+  margin-bottom: 10px;
+}
+
+.current-field strong {
+  font-weight: bold;
+  color: #555;
+}
+
+.current-field span {
+  font-weight: normal;
+  color: #777;
+}

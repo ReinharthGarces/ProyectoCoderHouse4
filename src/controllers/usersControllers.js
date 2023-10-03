@@ -1,5 +1,6 @@
 const { createHash } = require('../utils/passwordHash')
 const userModel = require('../dao/models/userModel')
+const UsersDTO = require('../dto/usersManagerDTO')
 
 class UsersController {
   async sessions (req, res) {
@@ -16,9 +17,9 @@ class UsersController {
       } else {
         user.role = 'user'; 
       }
-  
       user = await user.save();
-      return res.redirect('/login');
+      return res.redirect('/login')
+// return res.send({ status: 'success' , access_token }); API
     } catch (error) {
       return res.status(500).json({ error: 'Error en el servidor' });
     }
@@ -32,6 +33,7 @@ class UsersController {
         return res.redirect('/admin/dashboard');
       } else {
         return res.redirect('/products');
+        // return res.json({ user });
       }
     } catch (error) {
       return res.status(500).json({ error: 'Error en el servidor' });
@@ -78,11 +80,17 @@ class UsersController {
     return res.redirect('/products');
   }
 
-  async current (req, res) {
-    return res.json({
-      user:req.user,
-      session:req.session});
+  async current(req, res) {
+    try {
+      let user = req.user;
+      user = new UsersDTO(user);
+      console.log(user, 'current');
+      return res.send({ status: 'success', payload: user });
+    } catch (error) {
+      console.error('Error en current:', error);
+      return res.status(500).json({ error: 'Error al obtener la información actual' });
+    }
   }
-}
+}  
 
 module.exports = UsersController

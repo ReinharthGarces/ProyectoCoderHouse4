@@ -10,7 +10,8 @@ cartsRouter.post('/:cid/products/:pid', cartsController.getCartByIdAndPopulate.b
 cartsRouter.delete('/:cid/products/:pid', cartsController.getAllCartsAndDelete.bind(cartsController))
 cartsRouter.put('/:cid', cartsController.updatedCartById.bind(cartsController))
 cartsRouter.put('/:cid/products/:pid', cartsController.updatedCartAndQuantity.bind(cartsController))
-cartsRouter.delete('/:cid', cartsController.deleteCartById .bind(cartsController))
+cartsRouter.delete('/:cid', cartsController.deleteCartById.bind(cartsController))
+cartsRouter.post('/:cid/purchase', cartsController.getCartByIdAndPurchase.bind(cartsController))
 
 module.exports = cartsRouter
 

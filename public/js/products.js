@@ -1,5 +1,4 @@
 // products.js
-// products.js
 document.addEventListener('DOMContentLoaded', () => {
   const aggCarritoForm = document.getElementById('aggCarrito');
   aggCarritoForm.addEventListener('submit', async (event) => {

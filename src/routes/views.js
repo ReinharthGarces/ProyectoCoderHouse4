@@ -1,8 +1,10 @@
 const { Router } = require('express')
 const viewsRouter = Router()
 const ProductsManager = require('../dao/Db/productsManagerDb')
-const productsManager = new ProductsManager ()
 const CartsManager = require('../dao/Db/cartsManagerDb')
+// const ProductsManager = require('../dao/Fs/ProductsManager')
+// const CartsManager = require('../dao/Fs/cartsManager')
+const productsManager = new ProductsManager ()
 const cartsManager = new CartsManager()
 
 
@@ -130,6 +132,7 @@ viewsRouter.get('/profile', (req, res) => {
     }
 
     const user = req.user;
+    console.log(user);
     const configuracion = {
       title: 'ReinharthApp-Profile',
       style: 'profile.css'
@@ -158,6 +161,10 @@ viewsRouter.get('/admin/dashboard', checkUserRole('admin'), (req, res) => {
 //Vista para recovery_password.handlebars
 viewsRouter.get('/recovery_password', (req, res) => {
   return res.render('recovery_password', { title: 'ReinharthApp-RecoveryPassword', style: 'recovery_password.css' });
+})
+
+viewsRouter.get('/current', (req, res) => {
+  return res.render('current', { title: 'ReinharthApp-Current', style: 'current.css' });
 })
 
 module.exports = viewsRouter
