@@ -19,6 +19,7 @@ const GitHubStrategy = require('passport-github2');
 const flash = require('connect-flash');
 const nodemailer = require('nodemailer')
 const twilio = require('twilio');
+const compression = require('express-compression');
 require('dotenv').config();
 
 // Configuro mi servidor
@@ -41,6 +42,7 @@ initializePassport()
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors())
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));

@@ -6,6 +6,7 @@ const CartsManager = require('../dao/Db/cartsManagerDb')
 // const CartsManager = require('../dao/fs/cartsManager')
 const cartsManager = new CartsManager()
 const GitHubStrategy = require('passport-github2');
+const cookie = require('cookie');
 const LocalStrategy = passportLocal.Strategy
 const { generateToken } = require('../utils/jwt')
 const flash = require('connect-flash');

@@ -1,6 +1,6 @@
 <!-- products.handlebars -->
 <div id="header">
-  <a href="/carts/{{cart._id}}" class="cart-logo">
+  <a href="/carts/{{user.cart._id}}" class="cart-logo">
     <img src="img/logoCarrito.png" alt="Logo Carrito">
   </a>
 </div>
@@ -15,7 +15,7 @@
     <p>Precio: {{price}}</p>
     <p>Categoría: {{category}}</p>
     <button onclick="window.location='/products/{{_id}}'">Ver detalles</button>
-    <form id="aggCarrito" action="/api/carts/" method="post">
+    <form id="aggCarrito" data-user-cart="{{user.cart._id}}" method="get">
       <button type="submit" class="addToCartButton">Agregar al carrito</button>
       <input type="hidden" name="productId" value="{{_id}}">
   </form>

@@ -4,6 +4,7 @@ const ProductsManager = require('../dao/Db/productsManagerDb')
 const CartsManager = require('../dao/Db/cartsManagerDb')
 const TicketsManager = require('../dao/Db/ticketsManagerDb')
 const CartDTO = require('../dto/cartsManagerDTO')
+const TicketsDTO = require('../dto/ticketsManagerDTO')
 const mongoose = require('mongoose')
 const productModel = require('../dao/models/productModel')
 const userModel = require('../dao/models/userModel')
@@ -244,12 +245,12 @@ class CartsController {
   
       const productosNoProcesados = [];
       let totalAmount = 0; 
-  
+
       for (const cartProduct of cart.products) {
         const productId = cartProduct.productId;
         const quantityInCart = cartProduct.quantity;
   
-        const product = await productModel.findById(productId);
+        const product = await this.ProductsController.getProductById(productId);
   
         if (!product) {
           return res.status(404).json({ error: 'Producto no encontrado' });
@@ -265,16 +266,19 @@ class CartsController {
           productosNoProcesados.push(productId);
         }
       }
-  
-      // cart.purchased = true;
-      await cart.save();
-      
-      const infoTicket = await this.ticketsController.generateTicket( user.email, totalAmount );
-      console.log('infoTicket', infoTicket)
+
+      if (totalAmount === 0) {
+        return res.status(200).json({ message: 'Carrito Vacío' });
+      }
+
+      let infoTicket = await this.ticketsController.generateTicket( totalAmount, user.email );
+      infoTicket = new TicketsDTO(infoTicket)
+      console.log( infoTicket )
   
       cart.products = cart.products.filter((cartProduct) =>
         !productosNoProcesados.includes(cartProduct.productId.toString())
       );
+
       await cart.save();
   
       if (productosNoProcesados.length > 0) {

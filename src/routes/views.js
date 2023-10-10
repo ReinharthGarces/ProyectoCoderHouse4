@@ -67,10 +67,21 @@ viewsRouter.get('/products', async (req, res) => {
 
 //Vista productsDetails.handlebars
 viewsRouter.get('/products/:pid', async (req, res) => {
-  const productId = req.params.pid;
-  const product = await productsManager.getProductById(productId);
-  console.log(product);
-  return res.render('productDetails', { title: 'ReinharthApp-ProductDetails', style: 'productDetails.css',  product: product.toObject() });
+  try {
+    const user = req.user
+    const userCart = user.cart._id;
+    const productId = req.params.pid;
+    const product = await productsManager.getProductById(productId);
+    
+    if (!user) {
+      return res.redirect('/login')
+      
+    } else {
+      return res.render('productDetails', { title: 'ReinharthApp-ProductDetails', style: 'productDetails.css',  product: product.toObject() , userCart });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Error en el servidor' });
+  }
 });
 
 //Vista cartDetails.handlebars
@@ -146,6 +157,7 @@ viewsRouter.get('/profile', (req, res) => {
 });
 
 viewsRouter.post('/logout', (req, res) => {
+  res.clearCookie('tokenJwt');
   req.session.destroy(); 
   return res.redirect('/login'); 
 });

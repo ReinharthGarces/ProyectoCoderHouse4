@@ -14,7 +14,8 @@ const userSchema = Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'carts', 
   },
-  role: String
+  role: String,
+  token: String
 })
 
 module.exports = model('users', userSchema)

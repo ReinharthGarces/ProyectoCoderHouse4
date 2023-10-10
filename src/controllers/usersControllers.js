@@ -19,7 +19,7 @@ class UsersController {
       }
       user = await user.save();
       return res.redirect('/login')
-// return res.send({ status: 'success' , access_token }); API
+    // return res.send({ status: 'success' , access_token }); API
     } catch (error) {
       return res.status(500).json({ error: 'Error en el servidor' });
     }
@@ -28,7 +28,16 @@ class UsersController {
   async login (req, res) {
     try {
       const user = req.user;
+      const token = user.token
       console.log(user, 'login');
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true, 
+        sameSite: 'strict',
+        expires: new Date(Date.now() + 3600000) 
+      });
+
       if (user.role === 'admin') {
         return res.redirect('/admin/dashboard');
       } else {
