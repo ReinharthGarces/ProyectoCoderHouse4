@@ -1,4 +1,5 @@
 // products.js
+
 document.addEventListener('DOMContentLoaded', () => {
   const aggCarritoForm = document.getElementById('aggCarrito');
 

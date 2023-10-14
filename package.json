@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -40,6 +41,7 @@
     "shortid": "^2.2.16",
     "socket.io": "^4.7.1",
     "twilio": "^4.18.0",
-    "v2": "^0.0.3"
+    "v2": "^0.0.3",
+    "winston": "^3.11.0"
   }
 }

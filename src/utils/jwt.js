@@ -1,29 +1,33 @@
 const jwt = require('jsonwebtoken');
 
-const PRIVATE_KEY = 'secretKey';
-
 const generateToken = (user) => {
-  const token = jwt.sign({ user }, PRIVATE_KEY, { expiresIn: '24h' });
-  return token;
-}
+  try {
+    const token = jwt.sign({ user }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
+    return token;
+  } catch (error) {
+    throw new Error('Error al generar el token');
+  }
+};
 
 const authToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  try {
+    const authToken = req.cookies.tokenJwt;
 
-  if (!authHeader) {
-    return res.status(401).send({ error: 'Token no proporcionado' });
-  }
-
-  const token = authHeader.split(' ')[1];
-  jwt.verify(token, PRIVATE_KEY, (error, credentials) => {
-    if (error) {
-      return res.status(401).send({ error: 'Token no válido' });
+    if (!authToken) {
+      return res.status(401).send({ error: 'Token no proporcionado' });
     }
 
-    req.user = credentials.user;
-    console.log(req.user, 'authToken');
-    next();
-  });
-}
+    jwt.verify(authToken, process.env.JWT_SECRET_KEY, (error, credentials) => {
+      if (error) {
+        return res.status(401).send({ error: 'Token no válido' });
+      }
 
-module.exports = { generateToken, authToken }
+      req.user = credentials.user;
+      next();
+    });
+  } catch (error) {
+    return res.status(500).send({ error: 'Error en la autenticación' });
+  }
+};
+
+module.exports = { generateToken, authToken };

@@ -1,10 +1,10 @@
 class UsersDTO {
-  constructor(users) {
-    this._id = users._id;
-    this.name = users.name;
-    this.lastname = users.lastname;
-    this.role = users.role;
-    this.token = users.token;
+  constructor(user) {
+    this._id = user._id;
+    this.name = user.name;
+    this.lastname = user.lastname;
+    this.email = user.email;
+    this.role = user.role;
   }
 }
 

@@ -20,6 +20,7 @@ const flash = require('connect-flash');
 const nodemailer = require('nodemailer')
 const twilio = require('twilio');
 const compression = require('express-compression');
+const addLogger = require('./src/utils/logger');
 require('dotenv').config();
 
 // Configuro mi servidor
@@ -43,10 +44,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors())
 app.use(compression());
+app.use(cookieParser('signed'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use(cookieParser('signed'));
+app.use(addLogger)
 app.use(flash());
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
@@ -115,26 +117,6 @@ connectToDatabase();
 const PORT = process.env.PORT;
 server.listen(PORT, () => console.log(`Servidor arriba desde puerto ${PORT}`));
 
-//Testing Cookies
-app.get('/setCookie', (req, res) => { 
-  res.cookie('testCookie', 'Probando Cookies', { maxAge: 10000 }).send('Cookie Creada')
-})
-//Obtener Cookies
-app.get('/getCookies', (req, res) => { 
-  res.send(req.cookies)
-})
-//Eliminar Cookies
-app.get('/deleteCookie', (req, res) => {
-  res.clearCookie('testCookie').send('Cookie Eliminada')
-})
-//Cookies firmada
-app.get('/setSignedCookie', (req, res) => {
-  res.cookie('signedCookie', 'Probando Cookies Firmadas', { signed: true }).send('Cookie Creada')
-})
-//Obtener Cookies Firmadas
-app.get('/getSignedCookies', (req, res) => { 
-  res.send(req.signedCookies)
-})
 
 //Config transporter y GET para el envio del mail y SMS
 const transporter = nodemailer.createTransport({
@@ -174,4 +156,10 @@ app.get('/sms', async (req, res) => {
     to: '+541123915928'
   })
   res.send({ status: 'success', message: 'SMS enviado' })
+})
+
+//Prueba de logger
+app.get('/error', (req, res) => {
+  req.logger.warning('Error en la petición')
+  res.send({ message: "Prueba de logger" })
 })

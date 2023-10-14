@@ -98,7 +98,6 @@ const initializePassport = () => {
 
   passport.serializeUser((user, done) => {
     try {
-      console.log('serializeUser')
       done(null, user._id)
     } catch (error) {
       done(error);

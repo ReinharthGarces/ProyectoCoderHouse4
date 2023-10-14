@@ -1,10 +1,16 @@
 const { createHash } = require('../utils/passwordHash')
-const userModel = require('../dao/models/userModel')
 const UsersDTO = require('../dto/usersManagerDTO')
+const UserRepository = require('../repositories/users.repository'); 
+const userModel = require('../dao/models/userModel')
+
 
 class UsersController {
+  constructor() {
+    this.userRepository = new UserRepository();
+  }
+
   async sessions (req, res) {
-    console.log('get', req.user);
+    console.log(req.user);
     return res.json(req.session);
   }
 
@@ -19,6 +25,7 @@ class UsersController {
       }
       user = await user.save();
       return res.redirect('/login')
+    //API
     // return res.send({ status: 'success' , access_token }); API
     } catch (error) {
       return res.status(500).json({ error: 'Error en el servidor' });
@@ -28,10 +35,10 @@ class UsersController {
   async login (req, res) {
     try {
       const user = req.user;
-      const token = user.token
+      const tokenJwt = user.token
       console.log(user, 'login');
 
-      res.cookie('token', token, {
+      res.cookie('tokenJwt', tokenJwt, {
         httpOnly: true,
         secure: true, 
         sameSite: 'strict',
@@ -41,8 +48,9 @@ class UsersController {
       if (user.role === 'admin') {
         return res.redirect('/admin/dashboard');
       } else {
-        return res.redirect('/products');
-        // return res.json({ user });
+        return res
+        .status(200)
+        .redirect('/products')
       }
     } catch (error) {
       return res.status(500).json({ error: 'Error en el servidor' });
@@ -51,7 +59,9 @@ class UsersController {
 
   async recoveryPassword (req, res) {
     try {
-      let user = await userModel.findOne({ email: req.body.email })
+      const userEmail = req.body.email
+      let user = await this.userRepository.getUser(userEmail);
+
       if (!user) {
         return res.status(401).json({
           error: 'El usuario no existe en el sistema'
@@ -59,7 +69,7 @@ class UsersController {
       }
   
       const newPassword = createHash(req.body.password)
-      await userModel.updateOne({ email: user.email }, { password: newPassword })  
+      await this.userRepository.updatePassword(userEmail, newPassword)  
       return res.redirect('/login')
     } catch (error) {
       console.error(error)
@@ -94,7 +104,11 @@ class UsersController {
       let user = req.user;
       user = new UsersDTO(user);
       console.log(user, 'current');
-      return res.send({ status: 'success', payload: user });
+      return res
+      .status(200)
+      .redirect('/current')
+      //API
+      // .json({ status: 'success', payload: user })
     } catch (error) {
       console.error('Error en current:', error);
       return res.status(500).json({ error: 'Error al obtener la información actual' });

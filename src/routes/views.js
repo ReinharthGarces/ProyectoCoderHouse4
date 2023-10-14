@@ -6,6 +6,8 @@ const CartsManager = require('../dao/Db/cartsManagerDb')
 // const CartsManager = require('../dao/Fs/cartsManager')
 const productsManager = new ProductsManager ()
 const cartsManager = new CartsManager()
+const { authToken } = require('../utils/jwt')
+const { sessionMiddleware, authorize} = require('../middlewares/authMiddlewares')
 
 
 //Vista home.handlebars
@@ -16,7 +18,7 @@ viewsRouter.get('/home', async (req,res) => {
 })
 
 //Vista realTimeProducts.Handlebars
-viewsRouter.get('/realTimeProducts', async (req,res) => {
+viewsRouter.get('/realTimeProducts', authorize(['admin']), async (req,res) => {
   const productsFromDB =  await productsManager.getAllProducts()
   const products = productsFromDB.map(product => product.toObject())
   return res.render('realTimeProducts', { title: 'ReinharthApp-Products', style: 'realTimeProducts.css', products })
@@ -44,12 +46,12 @@ viewsRouter.post('/realTimeProducts', async (req,res) => {
 })
 
 //Vista chat.handlebars
-viewsRouter.get('/chat', async (req,res) => {
+viewsRouter.get('/chat', authorize(['user']), async (req,res) => {
   return res.render('chat', { title: 'ReinharthApp-chat', style: 'chat.css' })
 })
 
 //Vista products.handlebars
-viewsRouter.get('/products', async (req, res) => {
+viewsRouter.get('/products', authorize(['user']), async (req, res) => {
   try {
     const user = req.user
     const productsFromDB = await productsManager.getAllProducts();
@@ -109,24 +111,6 @@ viewsRouter.get('/carts/:cid', async (req, res) => {
   return res.render('cartDetails', {title: 'ReinharthApp-CartDetails', style:'cartDetails.css', cartId: cart._id, products: populatedProducts});
 });
 
-//Middleware para que no se pueda acceder a la vista profile si no está logueado
-const sessionMiddleware = (req, res, next) => {
-  if (req.session.user) {
-    return res.redirect('/profile')
-  }
-  return next()
-}
-//Middleware para verificar el role del usuario
-const checkUserRole = (role) => {
-  return (req, res, next) => {
-    if (req.user && req.user.role === role) {
-      return next();
-    } else {
-      return res.status(403).json({ error: 'Acceso denegado' });
-    }
-  };
-};
-
 // Rutas de registro y inicio de sesión
 viewsRouter.get('/register', sessionMiddleware, (req, res) => {
   return res.render('register', { title: 'ReinharthApp-Register', style: 'register.css' });
@@ -143,7 +127,6 @@ viewsRouter.get('/profile', (req, res) => {
     }
 
     const user = req.user;
-    console.log(user);
     const configuracion = {
       title: 'ReinharthApp-Profile',
       style: 'profile.css'
@@ -163,7 +146,7 @@ viewsRouter.post('/logout', (req, res) => {
 });
 
 // Ruta que solo permite el acceso a administradores
-viewsRouter.get('/admin/dashboard', checkUserRole('admin'), (req, res) => {
+viewsRouter.get('/admin/dashboard', authorize(['admin']), (req, res) => {
   return res.render('admin_dashboard', {
     title: 'Panel de Administración',
     style: 'admin.css'
@@ -175,8 +158,16 @@ viewsRouter.get('/recovery_password', (req, res) => {
   return res.render('recovery_password', { title: 'ReinharthApp-RecoveryPassword', style: 'recovery_password.css' });
 })
 
-viewsRouter.get('/current', (req, res) => {
-  return res.render('current', { title: 'ReinharthApp-Current', style: 'current.css' });
-})
+viewsRouter.get('/current', authToken, async (req, res) => {
+  try {
+    const user = req.user;
+    const token = req.cookies.tokenJwt;
+    return res.render('current', { title: 'ReinharthApp-Current', style: 'current.css', user: user });
+  } catch (error) {
+    console.error('Error al procesar la solicitud de la página current:', error);
+    return res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 
 module.exports = viewsRouter
