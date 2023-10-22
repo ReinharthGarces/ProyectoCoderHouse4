@@ -142,6 +142,17 @@ class ProductsController {
       return res.status(500).json({ status: 'error', error: 'Failed to delete product' });
     }
   }
+
+  async generateMockProducts(req, res) {
+    try {
+      const mockProducts = this.controller.generateMockProducts();
+      res.json({ status: 'success', message: 'Productos ficticios generados con éxito', mockProducts });
+    } catch (error) {
+      console.error('Error al generar productos ficticios:', error);
+      res.status(500).json({ status: 'error', error: 'Failed to generate mock products' });
+    }
+  }
+
 }
 
 module.exports = ProductsController;

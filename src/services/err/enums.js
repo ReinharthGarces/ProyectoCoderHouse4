@@ -1,7 +1,11 @@
-const EErors = {
-  ROUTING_ERROR: 1,
-  INVALID_TYPES_ERROR: 2,
-  DATABASE_ERROR: 3
+const EErrors = {
+  CREATE_CART_ERROR: 1,
+  SAVE_CART_ERROR: 2,
+  CART_NOT_FOUND: 3,
+  ADD_TO_CART_ERROR: 4,
+  UPDATING_CART_ERROR: 5,
+  REMOVE_FROM_CART_ERROR: 6,
+  CART_EMPTY: 7,
 }
 
 module.exports = EErrors;

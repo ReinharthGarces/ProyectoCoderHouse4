@@ -17,7 +17,6 @@ class CartsController {
   }
 
   async createCart (req, res) {
-    console.log(this)
     try {
       const cart = await this.controller.createCart();
       console.log('Cart ID:', cart);

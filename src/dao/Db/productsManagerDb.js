@@ -1,4 +1,5 @@
 const productModel = require('../models/productModel');
+const { faker } = require('@faker-js/faker');
 
 class ProductsManager {
   async createProduct(product) {
@@ -80,6 +81,32 @@ class ProductsManager {
       throw error;
     }
   }
+
+  async generateMockProducts() {
+    try {
+      const mockProducts = [];
+  
+      for (let i = 1; i <= 100; i++) {
+        const productsMock = {
+          _id: faker.database.mongodbObjectId(),
+          name: faker.commerce.productName(),
+          description: faker.lorem.sentence(),
+          code: faker.string.alphanumeric(6), 
+          price: faker.commerce.price(),
+          stock: faker.number.int(100), 
+          category: faker.commerce.department(),
+          thumbnail: faker.image.url(),
+        };
+        mockProducts.push(productsMock);
+      }
+
+      console.log(mockProducts);
+      return mockProducts;
+    } catch (error) {
+      console.error('Error al generar productos ficticios:', error);
+      throw error;
+    }
+  }  
 }
 
 module.exports = ProductsManager

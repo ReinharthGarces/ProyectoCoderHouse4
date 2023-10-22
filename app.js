@@ -21,6 +21,7 @@ const nodemailer = require('nodemailer')
 const twilio = require('twilio');
 const compression = require('express-compression');
 const addLogger = require('./src/utils/logger');
+const errorHandler = require('./src/middlewares/errors')
 require('dotenv').config();
 
 // Configuro mi servidor
@@ -39,6 +40,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }))
+app.use(errorHandler)
 initializePassport()
 app.use(passport.initialize());
 app.use(passport.session());
