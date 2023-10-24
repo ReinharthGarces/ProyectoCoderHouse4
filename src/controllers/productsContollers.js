@@ -19,13 +19,13 @@ class ProductsController {
   
       const result = await this.controller.createProduct(product);
       if (typeof result === 'string') {
-        console.error('Error al agregar el producto:', result);
+        req.prodLogger.warning('Error al agregar el producto:', result);
         return res.status(400).json({ status: 'error', error: result });
       }
   
       return res.status(201).json({ status: 'success', message: 'Product created' });
     } catch (error) {
-      console.error('Error al agregar el producto:', error);
+      req.prodLogger.error('Error al agregar el producto:', error);
       return res.status(500).json({ status: 'error', error: 'Failed to create product' });
     }
   }
@@ -92,7 +92,7 @@ class ProductsController {
   
       res.json(response);
     } catch (error) {
-      console.error(error);
+      req.prodLogger.warning(error)
       res.status(500).json({ error: 'Error al obtener los productos' });
     }
   }
@@ -114,7 +114,7 @@ class ProductsController {
   
       res.status(200).json(response);
     } catch (error) {
-      console.error(error);
+      req.prodLogger.warning(error)
       res.status(500).json({ error: 'Error al obtener el producto' });
     }
   }
@@ -127,7 +127,7 @@ class ProductsController {
   
       return res.json(product);
     } catch (error) {
-      console.error('Error updating product:', error);
+      req.prodLogger.warning('Error updating product:', error)
       return res.status(500).json({ status: 'error', error: 'Failed to update product' });
     }
   }
@@ -138,7 +138,7 @@ class ProductsController {
       const product = await this.controller.deleteProductById(productId)
       return res.json({ message: `El siguiente producto fue eliminado: ${product}` });
     } catch (error) {
-      console.error('Error deleting product:', error);
+      req.prodLogger.warning('Error deleting product:', error)
       return res.status(500).json({ status: 'error', error: 'Failed to delete product' });
     }
   }
@@ -148,7 +148,7 @@ class ProductsController {
       const mockProducts = this.controller.generateMockProducts();
       res.json({ status: 'success', message: 'Productos ficticios generados con éxito', mockProducts });
     } catch (error) {
-      console.error('Error al generar productos ficticios:', error);
+      req.devLogger.error('Error al generar productos ficticios');
       res.status(500).json({ status: 'error', error: 'Failed to generate mock products' });
     }
   }

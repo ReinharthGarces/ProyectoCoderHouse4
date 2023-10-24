@@ -20,7 +20,7 @@ const flash = require('connect-flash');
 const nodemailer = require('nodemailer')
 const twilio = require('twilio');
 const compression = require('express-compression');
-const addLogger = require('./src/utils/logger');
+const { devLogger, prodLogger } = require('./src/utils/logger');
 const errorHandler = require('./src/middlewares/errors')
 require('dotenv').config();
 
@@ -50,7 +50,7 @@ app.use(cookieParser('signed'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use(addLogger)
+app.use(devLogger, prodLogger)
 app.use(flash());
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
@@ -160,8 +160,13 @@ app.get('/sms', async (req, res) => {
   res.send({ status: 'success', message: 'SMS enviado' })
 })
 
-//Prueba de logger
-app.get('/error', (req, res) => {
-  req.logger.warning('Error en la petición')
-  res.send({ message: "Prueba de logger" })
+//Logger WINSTON
+app.get('/loggerTest', (req, res) => {
+    req.devLogger.debug('Mensaje de depuración');
+    req.prodLogger.http('Mensaje desde http');
+    req.devLogger.info('Mensaje de información');
+    req.devLogger.warning('Mensaje de advertencia');
+    req.prodLogger.error('Mensaje de error');
+    req.prodLogger.fatal('Mensaje fatal');
+  res.send({ message:'Registros generados'});
 })

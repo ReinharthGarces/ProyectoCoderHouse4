@@ -10,13 +10,14 @@ class UsersController {
   }
 
   async sessions (req, res) {
-    console.log(req.user);
+    req.devLogger.info(req.user)
     return res.json(req.session);
   }
 
   async register (req, res) {
     try {
-      console.log(req.user , 'register')
+      req.devLogger.info('register successful')
+
       let user = req.user;
       if (user.email === 'adminCoder@coder.com') {
         user.role = 'admin';
@@ -25,8 +26,6 @@ class UsersController {
       }
       user = await user.save();
       return res.redirect('/login')
-    //API
-    // return res.send({ status: 'success' , access_token }); API
     } catch (error) {
       return res.status(500).json({ error: 'Error en el servidor' });
     }
@@ -36,7 +35,7 @@ class UsersController {
     try {
       const user = req.user;
       const tokenJwt = user.token
-      console.log(user, 'login');
+      req.devLogger.info('login successful')
 
       res.cookie('tokenJwt', tokenJwt, {
         httpOnly: true,
@@ -53,6 +52,7 @@ class UsersController {
         .redirect('/products')
       }
     } catch (error) {
+      req.devLogger.error(error, 'login')
       return res.status(500).json({ error: 'Error en el servidor' });
     }
   }
@@ -72,27 +72,45 @@ class UsersController {
       await this.userRepository.updatePassword(userEmail, newPassword)  
       return res.redirect('/login')
     } catch (error) {
-      console.error(error)
-      return res.status(500).json({ error: 'Error en el servidor' })
+      req.devLogger.error('recoveryPassword', error)
+      return res.status(500).json({ error: 'Error en el servidor' });
     }
   }
 
-  async failRegister (req, res) {
-    return res.json({
-      error: 'Error al registrarse'
-    })
+  async failRegister(req, res) {
+    try {
+      throw new Error('Error al registrarse');
+    } catch (error) {
+      req.prodLogger.error('Error al registrarse', error);
+      return res.status(500).json({
+        error: 'Error al registrarse',
+      });
+    }
   }
-
   async failLogin (req, res) {
-    return res.json({
-      error: 'Error al iniciar sesión'
-    })
+    try {
+      throw new Error('Error al iniciar sesión');
+    } catch (error) {
+      req.prodLogger.error('Error al iniciar sesión', error);
+      return res.status(500).json({
+        error: 'Error al iniciar sesión',
+      });
+    }
   }
 
-  async github (req, res) {
-    return res.json({
-      message: 'La autenticación de GitHub se ha iniciado correctamente.'
-    })
+  async github(req, res) {
+    try {
+      req.devLogger.info('La autenticación de GitHub se ha iniciado correctamente.');
+  
+      return res.json({
+        message: 'La autenticación de GitHub se ha iniciado correctamente.'
+      });
+    } catch (error) {
+      req.devLogger.error('Error al iniciar la autenticación de GitHub', error);
+      return res.status(500).json({
+        error: 'Error al iniciar la autenticación de GitHub'
+      });
+    }
   }
   
   async githubCallback (req, res) {
@@ -103,14 +121,12 @@ class UsersController {
     try {
       let user = req.user;
       user = new UsersDTO(user);
-      console.log(user, 'current');
+      req.devLogger.debug('La información actual del usuario', user);
       return res
       .status(200)
       .redirect('/current')
-      //API
-      // .json({ status: 'success', payload: user })
     } catch (error) {
-      console.error('Error en current:', error);
+      req.devLogger.error('Error al obtener la información actual', error);
       return res.status(500).json({ error: 'Error al obtener la información actual' });
     }
   }

@@ -6,40 +6,59 @@ const customLevelsOptions = {
     error: 1,
     warning: 2,
     info: 3,
-    debug: 4,
-    http: 5,
-    warn: 6,
+    http: 4,
+    debug: 5,
   },
   colors: {
     fatal: 'red',
-    error: 'orange',
+    error: 'black',
     warning: 'yellow',
     info: 'blue',
-    debug: 'white',
     http: 'green',
-    warn: 'magenta',
+    debug: 'white',
   },
 };
 
-const logger = winston.createLogger({
+//Logger de desarrollo
+const developmentLogger = winston.createLogger({
   levels: customLevelsOptions.levels,
   format: winston.format.combine(
     winston.format.colorize({ colors: customLevelsOptions.colors }),
     winston.format.simple()
   ),
   transports: [
-    new winston.transports.Console({ level: 'http' }),
+    new winston.transports.Console({ level: 'debug' }),
+  ],
+});
+
+const devLogger = (req, res, next) => {
+  req.devLogger = developmentLogger;
+  next();
+};
+
+//Logger de produccion
+const productionLogger = winston.createLogger({
+  levels: customLevelsOptions.levels,
+  format: winston.format.combine(
+    winston.format.colorize({ colors: customLevelsOptions.colors }),
+    winston.format.simple()
+  ),
+  transports: [
+    new winston.transports.Console({ level: 'info' }),
     new winston.transports.File({
-      filename: 'logs/warns.log',
-      level: 'warning',
+      filename: 'logs/errors.log',
+      level: 'error',
     }),
   ],
 });
 
-const addLogger = (req, res, next) => {
-  req.logger = logger;
-  // req.logger.fatal(`${req.method} en ${req.url} - ${new Date().toLocaleString()}`);
+const prodLogger = (req, res, next) => {
+  req.prodLogger = productionLogger;
   next();
 };
 
-module.exports = addLogger;
+module.exports = {
+  devLogger,
+  prodLogger,
+};
+
