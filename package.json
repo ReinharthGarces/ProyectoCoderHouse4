@@ -8,7 +8,6 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "env": "set NODE_ENV=prod && nodemon src/app.js"
-
   },
   "keywords": [],
   "author": "",
@@ -42,6 +41,8 @@
     "passport-local": "^1.0.0",
     "shortid": "^2.2.16",
     "socket.io": "^4.7.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "twilio": "^4.18.0",
     "v2": "^0.0.3",
     "winston": "^3.11.0"

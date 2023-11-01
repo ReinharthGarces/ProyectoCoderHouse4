@@ -158,6 +158,12 @@ viewsRouter.get('/recovery_password', (req, res) => {
   return res.render('recovery_password', { title: 'ReinharthApp-RecoveryPassword', style: 'recovery_password.css' });
 })
 
+//Vista para restore_password.handlebars
+viewsRouter.get('/restore_password', (req, res) => {
+  const token = req.query.token
+  return res.render('restore_password', { title: 'ReinharthApp-RestorePassword', style: 'restore_password.css', token: token });
+})
+
 viewsRouter.get('/current', authToken, async (req, res) => {
   try {
     const user = req.user;

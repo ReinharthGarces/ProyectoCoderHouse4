@@ -12,6 +12,8 @@ sessionRouter.post('/register', passport.authenticate('register',
 sessionRouter.post('/login',  passport.authenticate('login',
   { failureRedirect: '/faillogin', failureFlash: true}), usersController.login.bind(usersController))
 sessionRouter.post('/recovery_password', usersController.recoveryPassword.bind(usersController))
+sessionRouter.get('/restore_password/:token', usersController.restorePassword.bind(usersController))
+sessionRouter.post('/restore_password/:token', usersController.restorePassword.bind(usersController))
 sessionRouter.get('/failregister', usersController.failRegister.bind(usersController))
 sessionRouter.get('/faillogin', usersController.failLogin.bind(usersController))
 sessionRouter.get('/github', passport.authenticate('github', { scope: ['user:email'] }), usersController.github.bind(usersController))

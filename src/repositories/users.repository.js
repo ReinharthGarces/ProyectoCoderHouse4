@@ -1,5 +1,7 @@
 const userModel = require('../dao/models/userModel');
 const userDTO = require('../dto/usersManagerDTO');
+const transporter = require('../config/nodemailer');
+const { createHash, isValidPassword } = require('../utils/passwordHash');
 
 class UserRepository {
   constructor(dao) {
@@ -28,7 +30,14 @@ class UserRepository {
 
   async updatePassword(email, newPassword) {
     try {
-      await userModel.updateOne({ email: email }, { password: newPassword });
+      const user = await userModel.findOne({ email: email });
+  
+      if (!isValidPassword(newPassword, user.password)) {
+        return { message: 'La nueva contraseña no puede ser la misma que la anterior.' };
+      } else {
+        const newPasswordHash = createHash(newPassword);
+        await userModel.updateOne({ email: email }, { password: newPasswordHash });
+      }
     } catch (error) {
       throw error;
     }
@@ -41,6 +50,25 @@ class UserRepository {
       throw error;
     }
   }
+
+  async sendPasswordAndResetEmail (userEmail, resetToken) {
+    try {
+    let sendEmail  = await transporter.sendMail({
+      from: process.env.NODEMAILER_USER_EMAIL, 
+      to: userEmail,
+      subject: 'Restablecimiento de contraseña',
+      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+              <a href="http://localhost:8080/restore_password?token=${resetToken}">
+                Haz click aqui para Restablecer contraseña
+              </a>`
+  });
+
+  } catch (error) {
+      console.error('Error al enviar el correo:', error);
+      throw new Error('Error al enviar el correo de restablecimiento');
+    }
+  }
 }
+
 
 module.exports = UserRepository;

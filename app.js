@@ -22,12 +22,29 @@ const twilio = require('twilio');
 const compression = require('express-compression');
 const { devLogger, prodLogger } = require('./src/utils/logger');
 const errorHandler = require('./src/middlewares/errors')
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUiExpress = require('swagger-ui-express');
 require('dotenv').config();
 
 // Configuro mi servidor
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+//configuracion de swagger
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.1',
+    info: {
+      title: 'Ecommerce API',
+      description: 'API para el ecommerce',
+    }
+  },
+  apis:['./docs/**/*.yaml'] 
+}
+
+const specs = swaggerJsdoc(swaggerOptions)
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
 
 //Middlewares
 app.use(session({
@@ -74,6 +91,11 @@ async function connectToDatabase() {
   }
 }
 
+//Inicializo servidor
+connectToDatabase();
+const PORT = process.env.PORT;
+server.listen(PORT, () => console.log(`Servidor arriba desde puerto ${PORT}`));
+
 // Inicializo mi webSockets
 io.on('connection', (socket) => {
   console.log('Nuevo cliente conectado!', socket.id);
@@ -113,12 +135,6 @@ io.on('connection', (socket) => {
   });
   io.emit('Mensaje Back-end', 'Mensaje enviado desde Back-end');
 });
-
-//Inicializo servidor
-connectToDatabase();
-const PORT = process.env.PORT;
-server.listen(PORT, () => console.log(`Servidor arriba desde puerto ${PORT}`));
-
 
 //Config transporter y GET para el envio del mail y SMS
 const transporter = nodemailer.createTransport({

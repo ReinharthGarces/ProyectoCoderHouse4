@@ -30,4 +30,13 @@ const authToken = (req, res, next) => {
   }
 };
 
-module.exports = { generateToken, authToken };
+const tokenRecoveryPassword = (userEmail) => {
+  try {
+    const token = jwt.sign({ userEmail }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
+    return token;
+  } catch (error) {
+    throw new Error('Error al generar el token');
+  }
+}
+
+module.exports = { generateToken, authToken, tokenRecoveryPassword };

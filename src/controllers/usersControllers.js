@@ -1,7 +1,10 @@
-const { createHash } = require('../utils/passwordHash')
+const jwt = require('jsonwebtoken');
+const { isValidPassword } = require('../utils/passwordHash')
+const { tokenRecoveryPassword } = require('../utils/jwt')
 const UsersDTO = require('../dto/usersManagerDTO')
 const UserRepository = require('../repositories/users.repository'); 
 const userModel = require('../dao/models/userModel')
+require('dotenv').config();
 
 
 class UsersController {
@@ -59,21 +62,41 @@ class UsersController {
 
   async recoveryPassword (req, res) {
     try {
-      const userEmail = req.body.email
+      const userEmail = req.body.email;
       let user = await this.userRepository.getUser(userEmail);
-
+  
       if (!user) {
         return res.status(401).json({
           error: 'El usuario no existe en el sistema'
-        })
+        });
       }
   
-      const newPassword = createHash(req.body.password)
-      await this.userRepository.updatePassword(userEmail, newPassword)  
-      return res.redirect('/login')
+      const tokenRestablecimiento = tokenRecoveryPassword (userEmail);
+      await this.userRepository.sendPasswordAndResetEmail(userEmail, tokenRestablecimiento);
+
+      return res.status(200).json({ message: 'Correo de restablecimiento enviado con éxito' });
     } catch (error) {
-      req.devLogger.error('recoveryPassword', error)
+      req.devLogger.error('recoveryPassword', error);
       return res.status(500).json({ error: 'Error en el servidor' });
+    }
+  }
+
+  async restorePassword (req, res) {
+    const token = req.params.token;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      let user = await this.userRepository.getUser(decoded.userEmail)
+
+      const newPassword = req.body.password;
+
+      await this.userRepository.updatePassword(user.email, newPassword)  
+
+      return res.redirect('/login');
+      } catch (err) {
+      if (err.name === 'TokenExpiredError') {
+        req.prodLogger.error('Token expirado', err);
+        res.status(401).json({ error: 'Token no válido o expirado' });
+      }
     }
   }
 
