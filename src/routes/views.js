@@ -18,14 +18,14 @@ viewsRouter.get('/home', async (req,res) => {
 })
 
 //Vista realTimeProducts.Handlebars
-viewsRouter.get('/realTimeProducts', authorize(['admin']), async (req,res) => {
+viewsRouter.get('/realTimeProducts', authorize(['admin','premium']), async (req,res) => {
   const productsFromDB =  await productsManager.getAllProducts()
   const products = productsFromDB.map(product => product.toObject())
   return res.render('realTimeProducts', { title: 'ReinharthApp-Products', style: 'realTimeProducts.css', products })
 })
 
 //Metodo POST realTimeProducts.Handlebars 
-viewsRouter.post('/realTimeProducts', async (req,res) => {
+viewsRouter.post('/realTimeProducts', authorize(['admin', 'premium']), async (req,res) => {
   const product = req.body
 
   if(!product.name || !product.description || !product.code || !product.price || !product.stock || !product.category || !product.thumbnail){
@@ -46,12 +46,12 @@ viewsRouter.post('/realTimeProducts', async (req,res) => {
 })
 
 //Vista chat.handlebars
-viewsRouter.get('/chat', authorize(['user']), async (req,res) => {
+viewsRouter.get('/chat', authorize(['user', 'premium']), async (req,res) => {
   return res.render('chat', { title: 'ReinharthApp-chat', style: 'chat.css' })
 })
 
 //Vista products.handlebars
-viewsRouter.get('/products', authorize(['user']), async (req, res) => {
+viewsRouter.get('/products', authorize(['user', 'premium']), async (req, res) => {
   try {
     const user = req.user
     const productsFromDB = await productsManager.getAllProducts();

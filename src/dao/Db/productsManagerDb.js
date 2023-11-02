@@ -58,6 +58,7 @@ class ProductsManager {
     existingProduct.price = updatedProduct.price || existingProduct.price;
     existingProduct.stock = updatedProduct.stock || existingProduct.stock;
     existingProduct.category = updatedProduct.category || existingProduct.category;
+    existingProduct.owner = updatedProduct.owner || existingProduct.owner;
     existingProduct.thumbnail = updatedProduct.thumbnail || existingProduct.thumbnail;
 
   // Guardar los cambios

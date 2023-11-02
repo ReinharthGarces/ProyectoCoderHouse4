@@ -7,7 +7,7 @@ class ProductsController {
     this.controller = new ProductsManager()
   }
 
-  async createProduct (req, res) {
+  async createProduct(req, res) {
     try {
       const product = req.body;
       const requiredFields = ['name', 'description', 'code', 'price', 'stock', 'category', 'thumbnail'];
@@ -16,8 +16,21 @@ class ProductsController {
       if (!isDataValid) {
         return res.status(400).json({ status: 'error', error: 'Incomplete values' });
       }
+
+      const user = req.user; 
+      let owner = 'admin';
   
+      if (user) {
+        if (user.role === 'premium') {
+          owner = user.email; 
+        } else if (user.role === 'user') {
+          return res.status(403).json({ status: 'error', error: 'No tienes permisos para crear productos' });
+        }
+      }
+  
+      product.owner = owner;
       const result = await this.controller.createProduct(product);
+  
       if (typeof result === 'string') {
         req.prodLogger.warning('Error al agregar el producto:', result);
         return res.status(400).json({ status: 'error', error: result });
@@ -25,11 +38,11 @@ class ProductsController {
   
       return res.status(201).json({ status: 'success', message: 'Product created' });
     } catch (error) {
-      req.prodLogger.error('Error al agregar el producto:', error);
+      req.prodLogger.error('Error al crear el producto:', error);
       return res.status(500).json({ status: 'error', error: 'Failed to create product' });
     }
   }
-
+  
   async getAllProducts(req, res) {
     try {
       let filteredProducts = await this.controller.getAllProducts();
@@ -132,16 +145,28 @@ class ProductsController {
     }
   }
 
-  async deleteProductById (req, res) {
+  async deleteProductById(req, res) {
     try {
-      const productId = req.params.pid
-      const product = await this.controller.deleteProductById(productId)
-      return res.json({ message: `El siguiente producto fue eliminado: ${product}` });
+      const productId = req.params.pid;
+      const user = req.user;
+      const product = await this.controller.getProductById(productId);
+  
+      if (!product) {
+        return res.status(404).json({ status: 'error', error: 'Producto no encontrado' });
+      }
+  
+      if (user.role === 'admin' || product.owner === 'admin' || product.owner === user.email) {
+        const deletedProduct = await this.controller.deleteProductById(productId);
+        return res.json({ message: `El siguiente producto fue eliminado: ${deletedProduct}` });
+      } else {
+        return res.status(403).json({ status: 'error', error: 'No tienes permisos para borrar este producto' });
+      }
     } catch (error) {
-      req.prodLogger.warning('Error deleting product:', error)
+      req.prodLogger.warning('Error deleting product:', error);
       return res.status(500).json({ status: 'error', error: 'Failed to delete product' });
     }
   }
+  
 
   async generateMockProducts(req, res) {
     try {

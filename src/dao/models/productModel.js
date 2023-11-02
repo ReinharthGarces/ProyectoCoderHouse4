@@ -11,6 +11,10 @@ const productSchema = mongoose.Schema({
   price: Number,
   stock: Number,
   category: String,
+  owner: { 
+    type: String,
+    ref: 'users',
+  },
   thumbnail: String
 })
   productSchema.plugin(mongoosePaginate)

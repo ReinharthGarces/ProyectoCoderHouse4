@@ -64,6 +64,7 @@ socket.on("nuevoProducto", (product) => {
     <td>${product.price}</td>
     <td>${product.stock}</td>
     <td>${product.category}</td>
+    <td>${product.owner}</td>
     <td>${product.thumbnail}</td>
     <td><button class="deleteButton" id="${product._id}">Borrar</button></td>
   `;

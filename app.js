@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
   });
   
   socket.on('eliminarProducto', (productId) => {
-    console.log('Producto eliminado', productId)
+    // console.log('Producto eliminado', productId)
     io.emit('productoEliminado', productId)
   })   
 
