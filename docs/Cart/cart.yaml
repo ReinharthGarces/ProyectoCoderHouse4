@@ -1,0 +1,143 @@
+info:
+  title: Documentación de Carrrito
+paths:
+  /carts:
+    get:
+      summary: Obtener todos los carritos
+      description: Obtiene todos los carritos disponibles.
+      operationId: getAllCarts
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Carritos recuperados exitosamente
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Cart'
+    post:
+      summary: Crear un nuevo carrito
+      description: Crea un nuevo carrito vacío.
+      operationId: createCart
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        201:
+          description: Carrito creado exitosamente
+          schema:
+            $ref: '#/definitions/CartId'
+  /carts/{cartId}:
+    get:
+      summary: Obtener un carrito por ID
+      description: Obtiene un carrito por su ID.
+      operationId: getCartById
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          type: string
+          description: ID del carrito
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Carrito recuperado exitosamente
+          schema:
+            $ref: '#/definitions/Cart'
+
+  /carts/{cid}/products/{pid}:
+    put:
+      summary: Actualizar la cantidad de un producto en un carrito
+      description: Actualiza la cantidad de un producto en un carrito.
+      operationId: updatedCartAndQuantity
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          type: string
+          description: ID del carrito
+        - name: pid
+          in: path
+          required: true
+          type: string
+          description: ID del producto
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Cantidad de producto actualizada exitosamente
+          schema:
+            $ref: '#/definitions/Cart'
+    delete:
+      summary: Eliminar un producto de un carrito
+      description: Elimina un producto de un carrito.
+      operationId: getAllCartsAndDelete
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          type: string
+          description: ID del carrito
+        - name: pid
+          in: path
+          required: true
+          type: string
+          description: ID del producto
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Producto eliminado exitosamente
+          schema:
+            $ref: '#/definitions/Cart'
+
+  /carts/{cid}/purchase:
+    post:
+      summary: Finalizar la compra de un carrito
+      description: Finaliza la compra de un carrito y genera un ticket.
+      operationId: getCartByIdAndPurchase
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          type: string
+          description: ID del carrito
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Compra finalizada exitosamente
+          schema:
+            $ref: '#/definitions/PurchaseResult'
+
+definitions:
+  Cart:
+    type: object
+    properties:
+      _id:
+        type: string
+      products:
+        type: array
+        items:
+          type: object
+          properties:
+            productId:
+              type: string
+            quantity:
+              type: number
+  CartId:
+    type: object
+    properties:
+      _id:
+        type: string
+  PurchaseResult:
+    type: object
+    properties:
+      message:
+        type: string

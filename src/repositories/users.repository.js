@@ -35,7 +35,7 @@ class UserRepository {
       if (!isValidPassword(newPassword, user.password)) {
         return { message: 'La nueva contraseña no puede ser la misma que la anterior.' };
       } else {
-        const newPasswordHash = createHash(newPassword);
+        const newPasswordHash = await createHash(newPassword);
         await userModel.updateOne({ email: email }, { password: newPasswordHash });
       }
     } catch (error) {

@@ -1,0 +1,137 @@
+info:
+  title: Documentación de Productos
+paths:
+  /products:
+    get:
+      summary: Obtener todos los productos
+      description: Obtiene todos los productos disponibles.
+      operationId: getAllProducts
+      produces:
+        - application/json
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Número máximo de productos a mostrar
+        - name: page
+          in: query
+          type: integer
+          description: Página actual
+        - name: query
+          in: query
+          type: string
+          description: Consulta de búsqueda
+        - name: category
+          in: query
+          type: string
+          description: Categoría de productos
+        - name: sort
+          in: query
+          type: string
+          description: Ordenar por precio (asc o desc)
+        - name: available
+          in: query
+          type: string
+          description: Mostrar solo productos disponibles
+      responses:
+        200:
+          description: Productos recuperados exitosamente
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+    post:
+      summary: Crear un nuevo producto
+      description: Crea un nuevo producto.
+      operationId: createProduct
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        201:
+          description: Producto creado exitosamente
+          schema:
+            $ref: '#/definitions/ProductId'
+  /products/{pid}:
+    get:
+      summary: Obtener un producto por ID
+      description: Obtiene un producto por su ID.
+      operationId: getProductById
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          type: string
+          description: ID del producto
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Producto recuperado exitosamente
+          schema:
+            $ref: '#/definitions/Product'
+    put:
+      summary: Actualizar un producto por ID
+      description: Actualiza un producto por su ID.
+      operationId: updateProductById
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          type: string
+          description: ID del producto
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Producto actualizado exitosamente
+          schema:
+            $ref: '#/definitions/Product'
+    delete:
+      summary: Eliminar un producto por ID
+      description: Elimina un producto por su ID.
+      operationId: deleteProductById
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          type: string
+          description: ID del producto
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Producto eliminado exitosamente
+          schema:
+            $ref: '#/definitions/ProductId'
+
+definitions:
+  Product:
+    type: object
+    properties:
+      _id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      code:
+        type: string
+      price:
+        type: number
+      stock:
+        type: number
+      category:
+        type: string
+      thumbnail:
+        type: string
+      owner:
+        type: string
+  ProductId:
+    type: object
+    properties:
+      _id:
+        type: string
