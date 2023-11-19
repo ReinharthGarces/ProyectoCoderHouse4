@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "env": "set NODE_ENV=prod && nodemon src/app.js"
+    "carts-test": "mocha test/cartsRouter.test.js",
+    "products-test": "mocha test/productsRouter.test.js",
+    "sessions-test": "mocha test/sessionsRouter.test.js"
   },
   "keywords": [],
   "author": "",
@@ -49,6 +51,7 @@
   },
   "devDependencies": {
     "chai": "^4.3.10",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
   }
 }

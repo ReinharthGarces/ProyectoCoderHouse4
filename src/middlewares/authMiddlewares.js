@@ -7,7 +7,7 @@ const sessionMiddleware = (req, res, next) => {
 
 const authorize = (roles) => {
   return (req, res, next) => {
-    const user = req.user; 
+    const user = req.user 
     
     if (!user) {
       return res.status(401).send({ error: 'No autorizado' });

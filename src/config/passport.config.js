@@ -9,7 +9,6 @@ const GitHubStrategy = require('passport-github2');
 const cookie = require('cookie');
 const LocalStrategy = passportLocal.Strategy
 const { generateToken } = require('../utils/jwt')
-const flash = require('connect-flash');
 
 
 const initializePassport = () => {
@@ -51,7 +50,7 @@ const initializePassport = () => {
         }  
 
         const body = req.body
-        body.password = createHash(body.password)
+        body.password = await createHash(body.password)
         console.log({ body })
         
         const newUser = await userModel.create(body)

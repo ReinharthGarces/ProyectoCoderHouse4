@@ -186,3 +186,5 @@ app.get('/loggerTest', (req, res) => {
     req.prodLogger.fatal('Mensaje fatal');
   res.send({ message:'Registros generados'});
 })
+
+module.exports = app;

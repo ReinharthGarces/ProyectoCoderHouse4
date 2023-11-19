@@ -224,7 +224,7 @@ class CartsController {
   
       return res.status(200).json(updatedCart);
     } catch (err) {
-      req.prodLogger.error('Error al eliminar el carrito', err)
+      req.prodLogger.error('Error al Vaciar el carrito', err)
       return res.status(500).json({ error: 'Error al eliminar productos del carrito' });
     }
   }

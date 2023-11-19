@@ -39,13 +39,12 @@ class ProductsManager {
 
   async updateProductById(_id, updatedProduct) {
     try {
-    // Buscar el producto por su ID
       const existingProduct = await productModel.findById(_id);
 
       if (!existingProduct) {
           throw new Error('Error: Producto no encontrado');
         }
-  // Verificar si el nuevo código ya existe en otro producto, excluyendo el producto actual
+
     const { code } = updatedProduct;
       if (existingProduct.code === code) {
         throw new Error('Error: Ya existe un producto con ese CODE');
@@ -61,7 +60,6 @@ class ProductsManager {
     existingProduct.owner = updatedProduct.owner || existingProduct.owner;
     existingProduct.thumbnail = updatedProduct.thumbnail || existingProduct.thumbnail;
 
-  // Guardar los cambios
     const updatedProductResult = await existingProduct.save();
       return updatedProductResult;
     } catch (error) {
