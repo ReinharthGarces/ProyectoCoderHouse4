@@ -6,6 +6,7 @@ const CartsManager = require('../dao/Db/cartsManagerDb')
 // const CartsManager = require('../dao/Fs/cartsManager')
 const productsManager = new ProductsManager ()
 const cartsManager = new CartsManager()
+const userModel = require('../dao/models/userModel')
 const { authToken } = require('../utils/jwt')
 const { sessionMiddleware, authorize} = require('../middlewares/authMiddlewares')
 
@@ -139,11 +140,21 @@ viewsRouter.get('/profile', (req, res) => {
   }
 });
 
-viewsRouter.post('/logout', (req, res) => {
-  res.clearCookie('tokenJwt');
-  req.session.destroy(); 
-  return res.redirect('/login'); 
+viewsRouter.post('/logout', async (req, res) => {
+  try {
+    const userId = req.user._id;
+    await userModel.updateOne({ _id: userId }, { $set: { last_connection: new Date() } });
+
+    res.clearCookie('tokenJwt');
+    req.session.destroy();
+
+    return res.redirect('/login');
+  } catch (error) {
+    console.error('Error en el logout:', error);
+    return res.status(500).json({ error: 'Error en el servidor' });
+  }
 });
+
 
 // Ruta que solo permite el acceso a administradores
 viewsRouter.get('/admin/dashboard', authorize(['admin']), (req, res) => {

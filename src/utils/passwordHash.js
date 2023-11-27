@@ -6,7 +6,6 @@ const createHash = async (password) => {
 }
 
 const isValidPassword = async (password, hashedPassword ) => {
-  console.log( hashedPassword, password)
   return bcrypt.compare( password, hashedPassword)
 }
 

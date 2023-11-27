@@ -4,6 +4,7 @@ const { tokenRecoveryPassword } = require('../utils/jwt')
 const UsersDTO = require('../dto/usersManagerDTO')
 const UserRepository = require('../repositories/users.repository'); 
 const userModel = require('../dao/models/userModel')
+const upload = require('../middlewares/multerMiddleware');
 require('dotenv').config();
 
 
@@ -46,6 +47,8 @@ class UsersController {
         sameSite: 'strict',
         expires: new Date(Date.now() + 3600000) 
       });
+
+      await userModel.updateOne({ _id: user._id }, { $set: { last_connection: new Date() } });
 
       if (user.role === 'admin') {
         return res.redirect('/admin/dashboard');
@@ -153,6 +156,71 @@ class UsersController {
       return res.status(500).json({ error: 'Error al obtener la información actual' });
     }
   }
-}  
+
+  async changeUserRole(req, res) {
+    try {
+      const uid = req.params.uid;
+      const newRole = req.body.role;
+  
+      if (newRole !== 'user' && newRole !== 'premium') {
+        return res.status(400).json({ error: 'El nuevo rol no es válido' });
+      }
+  
+      const user = await userModel.findById(uid);
+  
+      if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+  
+      const requiredDocuments = ['Identificación', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
+  
+      const documentsMissing = requiredDocuments.filter(doc => !user.documents.some(d => d.name === doc));
+  
+      if (newRole === 'premium' && documentsMissing.length > 0) {
+        return res.status(400).json({
+          error: 'Faltan documentos obligatorios para ser premium: ' + documentsMissing.join(', ')
+        });
+      }
+
+      user.role = newRole;
+      await user.save();
+  
+      return res.status(200).json({ message: 'Rol de usuario actualizado exitosamente' });
+    } catch (error) {
+      req.devLogger.error('Error al cambiar el rol del usuario', error);
+      return res.status(500).json({ error: 'Error al cambiar el rol del usuario' });
+    }
+  }
+  
+  async uploadDocuments (req, res) {
+    try {
+      const userId = req.params.uid;
+      const uploadedFiles = req.files; 
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+
+      if (uploadedFiles.length === 0) {
+        return res.status(400).json({ error: 'No se proporcionaron documentos para cargar' });
+      }
+  
+      user.documents = user.documents.concat(
+        uploadedFiles.map((file) => ({
+          name: file.originalname,
+          reference: `/uploads/${file.filename}`, 
+        }))
+      );
+  
+      await user.save();
+  
+      return res.status(200).json({ message: 'Documentos subidos exitosamente', user });
+    } catch (error) {
+      console.error('Error al subir documentos:', error);
+      return res.status(500).json({ error: 'Error en el servidor' });
+    }
+  }; 
+};
 
 module.exports = UsersController

@@ -2,6 +2,7 @@ const { Router } = require('express')
 const passport = require('passport')
 const { authToken } = require('../utils/jwt')
 const UsersController = require('../controllers/usersControllers')
+const upload = require('../middlewares/multerMiddleware')
 
 const sessionRouter = new Router()
 const usersController = new UsersController()
@@ -19,5 +20,9 @@ sessionRouter.get('/faillogin', usersController.failLogin.bind(usersController))
 sessionRouter.get('/github', passport.authenticate('github', { scope: ['user:email'] }), usersController.github.bind(usersController))
 sessionRouter.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login'}), usersController.githubCallback.bind(usersController))
 sessionRouter.get('/current', authToken, usersController.current.bind(usersController))
+sessionRouter.put('/premium/:uid', upload.array('documents'), usersController.changeUserRole.bind(usersController));
+sessionRouter.post('/:uid/documents', upload.array('documents'), usersController.uploadDocuments.bind(usersController));
+
+
 
 module.exports = sessionRouter

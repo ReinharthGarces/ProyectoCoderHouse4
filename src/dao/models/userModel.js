@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 const { Schema, model } = require('mongoose')
 
+const documentSchema = Schema({
+  name: String,
+  reference: String,
+});
+
 const userSchema = Schema({
   name: String,
   lastname: String,
@@ -15,7 +20,10 @@ const userSchema = Schema({
     ref: 'carts', 
   },
   role: String,
-  token: String
+  token: String,
+  last_connection: Date,
+  documents: [documentSchema],
 })
 
-module.exports = model('users', userSchema)
+const User = model('users', userSchema);
+module.exports = User;
