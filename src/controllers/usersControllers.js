@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
-const { isValidPassword } = require('../utils/passwordHash')
 const { tokenRecoveryPassword } = require('../utils/jwt')
+const { saveImage } = require('../middlewares/multerMiddleware')
 const UsersDTO = require('../dto/usersManagerDTO')
 const UserRepository = require('../repositories/users.repository'); 
 const userModel = require('../dao/models/userModel')
-const upload = require('../middlewares/multerMiddleware');
 require('dotenv').config();
 
 
@@ -113,6 +112,7 @@ class UsersController {
       });
     }
   }
+
   async failLogin (req, res) {
     try {
       throw new Error('Error al iniciar sesión');
@@ -192,35 +192,45 @@ class UsersController {
     }
   }
   
-  async uploadDocuments (req, res) {
+  async uploadDocuments(req, res) {
     try {
       const userId = req.params.uid;
-      const uploadedFiles = req.files; 
+      const uploadedFiles = req.files;
 
       const user = await userModel.findById(userId);
       if (!user) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
 
-      if (uploadedFiles.length === 0) {
+      if (!uploadedFiles || Object.keys(uploadedFiles).length === 0) {
         return res.status(400).json({ error: 'No se proporcionaron documentos para cargar' });
       }
-  
-      user.documents = user.documents.concat(
-        uploadedFiles.map((file) => ({
-          name: file.originalname,
-          reference: `/uploads/${file.filename}`, 
-        }))
-      );
-  
+
+      const documents = [];
+
+      // Itera sobre los archivos subidos y guarda la información en el array 'documents'
+      for (const key in uploadedFiles) {
+        const filesArray = uploadedFiles[key];
+        for (const file of filesArray) {
+          const filePath = saveImage(file,file.fieldname);
+          documents.push({
+            name: file.originalname,
+            reference: filePath,
+          });
+        }
+      }
+
+      // Concatena los nuevos documentos con los existentes del usuario
+      user.documents = user.documents.concat(documents);
+
       await user.save();
-  
+
       return res.status(200).json({ message: 'Documentos subidos exitosamente', user });
     } catch (error) {
       console.error('Error al subir documentos:', error);
       return res.status(500).json({ error: 'Error en el servidor' });
     }
-  }; 
+  }
 };
 
 module.exports = UsersController

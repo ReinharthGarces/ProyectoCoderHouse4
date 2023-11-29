@@ -9,6 +9,7 @@ const viewsRouter = require('./src/routes/views');
 const sessionRouter = require('./src/routes/sessions');
 const { saveMessage , getAllMessages } = require('./src/dao/Db/messagesManagerDb')
 const { Server } = require('socket.io');
+const path = require('path');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const mongoStore = require('connect-mongo');
@@ -66,6 +67,7 @@ app.use(compression());
 app.use(cookieParser('signed'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(express.static('public'));
 app.use(devLogger, prodLogger)
 app.use(flash());

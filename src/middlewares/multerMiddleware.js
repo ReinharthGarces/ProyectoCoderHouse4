@@ -1,26 +1,33 @@
 const multer = require('multer');
+const fs = require('fs');
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let destinationFolder;
 
-    if (req.body.type === 'profile') {
+const saveImage = (file, fieldname) => {
+  let destinationFolder;
+
+  switch (fieldname) {
+    case 'profile':
       destinationFolder = 'uploads/profiles/';
-    } else if (req.body.type === 'product') {
+      break;
+    case 'product':
       destinationFolder = 'uploads/products/';
-    } else if (req.body.type === 'document') {
+      break;
+    case 'document':
       destinationFolder = 'uploads/documents/';
-    } else {
-      destinationFolder = 'uploads/'; 
-    }
+      break;
+    default:
+      destinationFolder = 'uploads/';
+  }
 
-    cb(null, destinationFolder);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
+  const newPath = `${destinationFolder}${file.originalname}`;
+  fs.renameSync(file.path, newPath);
+  return newPath;
+};
 
-const upload = multer({ storage: storage });
+const upload = multer({ dest: 'uploads/' }).fields([
+{ name: 'document', maxCount: 10 },
+{ name: 'product', maxCount: 5 },
+{ name: 'profile', maxCount: 1 },
+]);
 
-module.exports = upload;
+module.exports = { upload, saveImage };
