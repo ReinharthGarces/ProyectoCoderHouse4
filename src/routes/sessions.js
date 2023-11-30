@@ -9,6 +9,7 @@ const sessionRouter = new Router()
 const usersController = new UsersController()
 
 sessionRouter.get('/', usersController.sessions.bind(usersController))
+sessionRouter.get('/allusers', usersController.getAllUsers.bind(usersController))
 sessionRouter.post('/register', passport.authenticate('register',
   { failureRedirect:'/failregister', failureFlash: true }), usersController.register.bind(usersController))
 sessionRouter.post('/login',  passport.authenticate('login',
@@ -23,6 +24,7 @@ sessionRouter.get('/githubcallback', passport.authenticate('github', { failureRe
 sessionRouter.get('/current', authToken, usersController.current.bind(usersController))
 sessionRouter.put('/premium/:uid', multerMiddleware.upload, usersController.changeUserRole.bind(usersController));
 sessionRouter.post('/:uid/documents',  multerMiddleware.upload, usersController.uploadDocuments.bind(usersController));
+sessionRouter.delete('/clean_inactive_users', usersController.cleanInactiveUsers.bind(usersController) )
 
 
 

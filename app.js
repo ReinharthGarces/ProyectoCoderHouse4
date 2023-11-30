@@ -67,8 +67,8 @@ app.use(compression());
 app.use(cookieParser('signed'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(express.static('public'));
+// app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(devLogger, prodLogger)
 app.use(flash());
 app.use('/api/products', productsRouter);

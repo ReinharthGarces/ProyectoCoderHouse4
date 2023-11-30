@@ -208,7 +208,6 @@ class UsersController {
 
       const documents = [];
 
-      // Itera sobre los archivos subidos y guarda la información en el array 'documents'
       for (const key in uploadedFiles) {
         const filesArray = uploadedFiles[key];
         for (const file of filesArray) {
@@ -220,15 +219,40 @@ class UsersController {
         }
       }
 
-      // Concatena los nuevos documentos con los existentes del usuario
       user.documents = user.documents.concat(documents);
-
       await user.save();
 
       return res.status(200).json({ message: 'Documentos subidos exitosamente', user });
     } catch (error) {
       console.error('Error al subir documentos:', error);
       return res.status(500).json({ error: 'Error en el servidor' });
+    }
+  }
+
+  async getAllUsers (req, res) {
+    try {
+      const users = await this.userRepository.getAllUsers();
+      return res.status(200).json(users); 
+    } catch (error) {
+      req.devLogger.error('Error al obtener los usuarios', error);
+      return res.status(500).json({ error: 'Error al obtener los usuarios' });
+    }
+  }
+
+  async cleanInactiveUsers (req, res) {
+    try {
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  
+      const deletedUsersResult = await this.userRepository.cleanInactiveUsers(twoDaysAgo);
+      if (deletedUsersResult.deletedCount > 0) {
+        return res.status(200).json({ message: `${deletedUsersResult.deletedCount} usuarios eliminados por inactividad` });
+      } else {
+        return res.status(404).json({ message: 'No se encontraron usuarios inactivos para eliminar' });
+      }
+    } catch (error) {
+      req.devLogger.error('Error al limpiar los usuarios inactivos', error);
+      return res.status(500).json({ error: 'Error al limpiar los usuarios inactivos' });
     }
   }
 };
