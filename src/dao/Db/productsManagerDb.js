@@ -1,4 +1,5 @@
 const productModel = require('../models/productModel');
+const transporter = require('../../config/nodemailer');
 const { faker } = require('@faker-js/faker');
 
 class ProductsManager {
@@ -106,6 +107,25 @@ class ProductsManager {
       throw error;
     }
   }  
-}
+
+  async productRemoveNotice(email, product) {
+    try {
+      const mailOptions = {
+        from: process.env.NODEMAILER_USER_EMAIL,
+        to: email,
+        subject: 'Advertencia: Producto eliminado de la base de datos',
+        html: `<h1>El producto ${product.name} con codigo ${product.code} ha sido eliminado.</h1>`
+      };
+
+      if (email !== 'admin') {
+        await transporter.sendMail(mailOptions);
+        console.log('Correo de advertencia enviado.');
+      }
+
+    } catch (error) {
+      console.error('Error al enviar el correo de advertencia:', error);
+    }
+  };
+};
 
 module.exports = ProductsManager

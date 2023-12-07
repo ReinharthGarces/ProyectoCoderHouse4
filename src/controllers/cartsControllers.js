@@ -286,7 +286,8 @@ class CartsController {
           productosNoProcesados,
         });
       } else {
-        return res.status(200).json({ message: 'Compra finalizada con éxito' });
+        return res.status(200).json({ message: 'Compra finalizada con éxito',
+          ticket: infoTicket });
       }
     } catch (error) {
       req.prodLogger.fatal('Error al finalizar la compra', error)

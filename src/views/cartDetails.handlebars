@@ -1,15 +1,10 @@
 <h1>Detalles del Carrito</h1>
-<p>Carrito ID: {{ cartId }}</p>
+<p><strong data-cart-id="{{ cartId }}">Carrito ID:</strong> {{ cartId }}</p>
 
 <h2>Productos en el carrito:</h2>
 <ul>
   {{#each products}}
     <li>
-      <div class="product-info">
-        <div class="product-property">
-          <span class="property-title">Producto ID:</span>
-          <span class="property-value">{{ this.product._id }}</span>
-        </div>
         <div class="product-property">
           <span class="property-title">Nombre:</span>
           <span class="property-value">{{ this.product.name }}</span>
@@ -31,6 +26,7 @@
   {{/each}}
 </ul>
 
+<button id="checkoutButton">Comprar</button>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/cartDetails.js"></script>

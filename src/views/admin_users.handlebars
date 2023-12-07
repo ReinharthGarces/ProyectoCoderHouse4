@@ -1,0 +1,27 @@
+<h1>{{title}}</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>{{this.email}}</td>
+          <td>{{this.role}}</td>
+          <td>
+            <button class="modify_button" onclick="modifyRole('{{this._id}}')">Modify Role</button>
+            <button class="delete_button" onclick="deleteUser('{{this.email}}')">Delete User</button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+<script src="/js/admin_users.js"></script>

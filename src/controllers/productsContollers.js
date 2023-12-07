@@ -150,6 +150,7 @@ class ProductsController {
       const productId = req.params.pid;
       const user = req.user;
       const product = await this.controller.getProductById(productId);
+      const ownerEmail = product.owner;
   
       if (!product) {
         return res.status(404).json({ status: 'error', error: 'Producto no encontrado' });
@@ -157,6 +158,7 @@ class ProductsController {
   
       if (user.role === 'admin' || product.owner === 'admin' || product.owner === user.email) {
         const deletedProduct = await this.controller.deleteProductById(productId);
+        const productRemoveNotice = await this.controller.productRemoveNotice(ownerEmail, product);
         return res.json({ message: `El siguiente producto fue eliminado: ${deletedProduct}` });
       } else {
         return res.status(403).json({ status: 'error', error: 'No tienes permisos para borrar este producto' });

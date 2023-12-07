@@ -23,8 +23,10 @@ sessionRouter.get('/github', passport.authenticate('github', { scope: ['user:ema
 sessionRouter.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login'}), usersController.githubCallback.bind(usersController))
 sessionRouter.get('/current', authToken, usersController.current.bind(usersController))
 sessionRouter.put('/premium/:uid', multerMiddleware.upload, usersController.changeUserRole.bind(usersController));
+sessionRouter.put('/modify_role/:uid',  usersController.changeUserRole.bind(usersController));
 sessionRouter.post('/:uid/documents',  multerMiddleware.upload, usersController.uploadDocuments.bind(usersController));
-sessionRouter.delete('/clean_inactive_users', usersController.cleanInactiveUsers.bind(usersController) )
+sessionRouter.delete('/clean_inactive_users', usersController.cleanInactiveUsers.bind(usersController))
+sessionRouter.delete('/delete_users', usersController.deleteUser.bind(usersController))
 
 
 

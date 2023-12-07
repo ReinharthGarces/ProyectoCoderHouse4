@@ -7,6 +7,8 @@ const CartsManager = require('../dao/Db/cartsManagerDb')
 const productsManager = new ProductsManager ()
 const cartsManager = new CartsManager()
 const userModel = require('../dao/models/userModel')
+const UserRepository = require('../repositories/users.repository')
+const userRepository = new UserRepository()
 const { authToken } = require('../utils/jwt')
 const { sessionMiddleware, authorize} = require('../middlewares/authMiddlewares')
 
@@ -155,12 +157,12 @@ viewsRouter.post('/logout', async (req, res) => {
   }
 });
 
-
 // Ruta que solo permite el acceso a administradores
 viewsRouter.get('/admin/dashboard', authorize(['admin']), (req, res) => {
   return res.render('admin_dashboard', {
     title: 'Panel de Administración',
-    style: 'admin.css'
+    style: 'admin_dashboard.css',
+    userName: req.user.name,
   });
 });
 
@@ -186,5 +188,28 @@ viewsRouter.get('/current', authToken, async (req, res) => {
   }
 });
 
+//Vista para purchase_completed.handlebars
+viewsRouter.get('/purchase_completed/cartId', async (req, res) => {
+  try {
+    const cartId = req.params.cartId;
+    // const ticketInfo = await tuControlador.getTicketInfoByCartId(cartId);
+
+    res.render('purchase_completed', { title: 'ReinharthApp-Purchase_completed', ticketInfo });
+  } catch (error) {
+    console.error('Error al mostrar la compra completada:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+})
+
+viewsRouter.get('/admin/users', authorize(['admin']), async (req, res) => {
+  try {
+    const users = await userRepository.getAllUsers();
+
+    res.render('admin_users', { title: 'Administración de Usuarios', style: 'admin_users.css', users:users });
+  } catch (error) {
+    console.error('Error al mostrar la gestión de usuarios:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+});
 
 module.exports = viewsRouter

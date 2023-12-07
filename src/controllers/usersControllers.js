@@ -167,20 +167,24 @@ class UsersController {
       }
   
       const user = await userModel.findById(uid);
+
+      if (newRole === user.role) {
+        return res.status(400).json({ error: 'El nuevo rol es el mismo que ya posee el cliente' });
+      }
   
       if (!user) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
   
-      const requiredDocuments = ['Identificación', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
+      // const requiredDocuments = ['Identificación', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
   
-      const documentsMissing = requiredDocuments.filter(doc => !user.documents.some(d => d.name === doc));
+      // const documentsMissing = requiredDocuments.filter(doc => !user.documents.some(d => d.name === doc));
   
-      if (newRole === 'premium' && documentsMissing.length > 0) {
-        return res.status(400).json({
-          error: 'Faltan documentos obligatorios para ser premium: ' + documentsMissing.join(', ')
-        });
-      }
+      // if (newRole === 'premium' && documentsMissing.length > 0) {
+      //   return res.status(400).json({
+      //     error: 'Faltan documentos obligatorios para ser premium: ' + documentsMissing.join(', ')
+      //   });
+      // }
 
       user.role = newRole;
       await user.save();
@@ -253,6 +257,22 @@ class UsersController {
     } catch (error) {
       req.devLogger.error('Error al limpiar los usuarios inactivos', error);
       return res.status(500).json({ error: 'Error al limpiar los usuarios inactivos' });
+    }
+  }
+
+  async deleteUser(req, res) {
+    try {
+      const userEmail = req.body.email;
+      const deletedUser = await this.userRepository.deleteUser(userEmail);
+      console.log(deletedUser)
+
+      if (!deletedUser) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      } 
+      return res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+    } catch (error) {
+      req.devLogger.error('Error al eliminar el usuario', error);
+      return res.status(500).json({ error: 'Error al eliminar el usuario' });
     }
   }
 };

@@ -51,7 +51,6 @@ const initializePassport = () => {
 
         const body = req.body
         body.password = await createHash(body.password)
-        console.log({ body })
         
         const newUser = await userModel.create(body)
   

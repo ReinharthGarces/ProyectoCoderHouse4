@@ -54,9 +54,14 @@ class UserRepository {
 
   async deleteUser(email) {
     try {
-      await userModel.deleteOne({ email: email });
+      const result = await userModel.deleteOne({ email: email });
+  
+      if (result.deletedCount === 0) {
+        throw new Error('Usuario no encontrado');
+      }
+      return result;
     } catch (error) {
-      throw error;
+      throw new Error(`Error al eliminar el usuario: ${error.message}`);
     }
   }
 
