@@ -17,8 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok) {
           const data = await response.json();
+          const code = data.ticket['code'];
           Swal.fire('Compra exitosa', data.message, 'success').then(() => {
-          window.location.href = '/purchase_completed';
+          window.location.href = `/${code}/purchase`;
         });
         } else {
           const data = await response.json();

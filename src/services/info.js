@@ -16,8 +16,16 @@ const generateCartErrorInfo = (cartId) => {
   }
 };
 
+const generateTicketErrorInfo = (ticketId) => {
+  if (!ticketId) {
+    return 'No se proporcionó un ID de ticket';
+  } else {
+    return `El ID de ticket '${ticketId}' no existe en la base de datos`;
+  }
+};
 
 module.exports = {
   generateUserErrorInfo,
   generateCartErrorInfo,
+  generateTicketErrorInfo
 };

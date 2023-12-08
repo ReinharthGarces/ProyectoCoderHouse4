@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const viewsRouter = Router()
+const TicketsManager = require('../dao/Db/ticketsManagerDb')
 const ProductsManager = require('../dao/Db/productsManagerDb')
 const CartsManager = require('../dao/Db/cartsManagerDb')
 // const ProductsManager = require('../dao/Fs/ProductsManager')
@@ -9,6 +10,7 @@ const cartsManager = new CartsManager()
 const userModel = require('../dao/models/userModel')
 const UserRepository = require('../repositories/users.repository')
 const userRepository = new UserRepository()
+const ticketsManager = new TicketsManager()
 const { authToken } = require('../utils/jwt')
 const { sessionMiddleware, authorize} = require('../middlewares/authMiddlewares')
 
@@ -189,12 +191,13 @@ viewsRouter.get('/current', authToken, async (req, res) => {
 });
 
 //Vista para purchase_completed.handlebars
-viewsRouter.get('/purchase_completed/cartId', async (req, res) => {
+viewsRouter.get('/:ticket/purchase', async (req, res) => {
   try {
-    const cartId = req.params.cartId;
-    // const ticketInfo = await tuControlador.getTicketInfoByCartId(cartId);
+    const ticketCode = req.params.ticket;
+    const ticketInfo = await ticketsManager.getTicketInfoByCode(ticketCode);
+    console.log(ticketInfo);
 
-    res.render('purchase_completed', { title: 'ReinharthApp-Purchase_completed', ticketInfo });
+    res.render('purchase_completed', { title: 'ReinharthApp-Purchase_completed', ticketInfo: ticketInfo.toObject(), style: 'purchase_completed.css'  });
   } catch (error) {
     console.error('Error al mostrar la compra completada:', error);
     res.status(500).send('Error interno del servidor');

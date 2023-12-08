@@ -1,0 +1,14 @@
+<body>
+  <div class="ticket-container">
+    <h1>Compra completada</h1>
+    <div class="ticket-info">
+      <p><strong>Code:</strong> {{ ticketInfo.code }}</p>
+      <p><strong>Fecha de compra:</strong> {{ ticketInfo.purchase_datetime }}</p>
+      <p><strong>Monto total:</strong> ${{ ticketInfo.amount }}</p>
+      <p><strong>Comprador:</strong> {{ ticketInfo.purchaser }}</p>
+    </div>
+    <div class="ticket-actions">
+      <a href="/products"><button id="goBackButton">Seguir comprando</button></a>
+    </div>
+  </div>
+</body>

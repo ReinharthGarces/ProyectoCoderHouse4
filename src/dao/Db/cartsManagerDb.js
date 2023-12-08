@@ -1,9 +1,13 @@
 const cartModel = require('../models/cartModel');
+const TicketsManager = require('../Db/ticketsManagerDb')
 const CustomError = require('../../services/err/customError')
 const EErrors = require('../../services/err/enums')
-const { generateCartErrorInfo } = require('../../services/info')
+const { generateCartErrorInfo, generateTicketErrorInfo } = require('../../services/info')
 
 class CartsManager {
+  constructor() {
+    this.ticketsManager = new TicketsManager()
+  }
   async getAllCarts() {
     try {
       const carts = await cartModel.find();

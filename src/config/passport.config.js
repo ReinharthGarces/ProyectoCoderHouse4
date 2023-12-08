@@ -1,14 +1,15 @@
-const passport = require('passport')
-const passportLocal = require('passport-local')
-const userModel = require('../dao/models/userModel')
-const { createHash, isValidPassword } = require('../utils/passwordHash')
-const CartsManager = require('../dao/Db/cartsManagerDb')
 // const CartsManager = require('../dao/fs/cartsManager')
-const cartsManager = new CartsManager()
-const GitHubStrategy = require('passport-github2');
-const cookie = require('cookie');
-const LocalStrategy = passportLocal.Strategy
+const passport = require('passport')
+const userModel = require('../dao/models/userModel')
+const passportLocal = require('passport-local')
+const { createHash, isValidPassword } = require('../utils/passwordHash')
 const { generateToken } = require('../utils/jwt')
+const CartsManager = require('../dao/Db/cartsManagerDb')
+const cartsManager = new CartsManager()
+const LocalStrategy = passportLocal.Strategy
+const GitHubStrategy = require('passport-github2');
+
+
 
 
 const initializePassport = () => {

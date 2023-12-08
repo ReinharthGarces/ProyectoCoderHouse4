@@ -6,6 +6,7 @@ const EErrors = {
   UPDATING_CART_ERROR: 5,
   REMOVE_FROM_CART_ERROR: 6,
   CART_EMPTY: 7,
+  TICKET_NOT_FOUND: 8,
 }
 
 module.exports = EErrors;

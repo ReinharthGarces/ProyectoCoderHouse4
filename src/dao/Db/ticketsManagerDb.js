@@ -16,6 +16,16 @@ class TicketsManager {
       throw new Error('Error al generar el ticket', error);
     }
   }
+
+  async getTicketInfoByCode(code) {
+    try {
+      const ticket = await ticketModel.findOne({ code: code});
+      return ticket;
+    } catch (error) {
+      console.error('Error al obtener la información del ticket en getTicketInfoByCode');
+      throw error;
+    }
+  }
 }
 
 module.exports = TicketsManager;
