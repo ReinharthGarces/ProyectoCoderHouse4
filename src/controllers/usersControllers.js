@@ -52,9 +52,7 @@ class UsersController {
       if (user.role === 'admin') {
         return res.redirect('/admin/dashboard');
       } else {
-        return res
-        .status(200)
-        .redirect('/products')
+        return res.redirect('/products')
       }
     } catch (error) {
       req.devLogger.error(error, 'login')

@@ -1,22 +1,35 @@
-/* Estilos generales para el perfil de usuario */
-.profile-container {
-  max-width: 400px;
-  margin: 0 auto;
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
   padding: 20px;
-  border: 1px solid #e1e1e1;
-  border-radius: 5px;
-  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+h1 {
+  color: #007bff;
+}
+
+.profile-container {
+  background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width:30vw;
+  height:35vh;
   text-align: center;
+  border-radius: 5%;
+  padding-left: 3vw;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
 }
 
-/* Estilos para los campos del perfil */
 .profile-field {
-  font-size: 18px;
   margin: 10px 0;
+  text-align: left;
 }
 
-/* Estilos para el botón de cierre de sesión */
 .logout-button {
   background-color: #d9534f;
   color: #fff;
@@ -25,6 +38,7 @@
   font-size: 16px;
   padding: 10px 20px;
   cursor: pointer;
+  margin-top: 30px;
 }
 
 .logout-button:hover {

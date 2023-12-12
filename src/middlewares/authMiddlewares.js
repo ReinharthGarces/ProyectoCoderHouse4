@@ -5,6 +5,7 @@ const sessionMiddleware = (req, res, next) => {
   return next()
 }
 
+
 const authorize = (roles) => {
   return (req, res, next) => {
     const user = req.user 

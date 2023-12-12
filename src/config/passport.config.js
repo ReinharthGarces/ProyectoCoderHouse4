@@ -10,8 +10,6 @@ const LocalStrategy = passportLocal.Strategy
 const GitHubStrategy = require('passport-github2');
 
 
-
-
 const initializePassport = () => {
   passport.use('github', new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,

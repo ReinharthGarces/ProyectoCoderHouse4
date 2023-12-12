@@ -12,7 +12,7 @@ const UserRepository = require('../repositories/users.repository')
 const userRepository = new UserRepository()
 const ticketsManager = new TicketsManager()
 const { authToken } = require('../utils/jwt')
-const { sessionMiddleware, authorize} = require('../middlewares/authMiddlewares')
+const { sessionMiddleware, authorize } = require('../middlewares/authMiddlewares')
 
 
 //Vista home.handlebars
@@ -56,16 +56,17 @@ viewsRouter.get('/chat', authorize(['user', 'premium']), async (req,res) => {
 })
 
 //Vista products.handlebars
-viewsRouter.get('/products', authorize(['user', 'premium']), async (req, res) => {
+viewsRouter.get('/products', async (req, res) => {
   try {
     const user = req.user
+    const userCart = user.cart._id;
     const productsFromDB = await productsManager.getAllProducts();
     const products = productsFromDB.map(product => product.toObject());
     
     if (!user) {
       return res.redirect('/login')
     } else {
-      return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products, user: user.toObject()});
+      return res.render('products', { title: 'ReinharthApp-Product', style: 'products.css', products: products, user: user.toObject() , userCart: userCart });
     }
   } catch (error) {
     return res.status(500).json({ error: 'Error en el servidor' });
@@ -121,7 +122,7 @@ viewsRouter.get('/register', sessionMiddleware, (req, res) => {
   return res.render('register', { title: 'ReinharthApp-Register', style: 'register.css' });
 });
 
-viewsRouter.get('/login', sessionMiddleware, (req, res) => {
+viewsRouter.get('/login', (req, res) => {
   return res.render('login', { title: 'ReinharthApp-Login', style: 'login.css' });
 });
 

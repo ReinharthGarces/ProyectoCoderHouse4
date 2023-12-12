@@ -1,10 +1,11 @@
+
 <div class="profile-container">
-  <h2>Perfil de usuario</h2>
+  <h1>Perfil de usuario</h1>
   <br><br>
-  <div class="profile-field">Nombre: {{user.name}}</div>
-  <div class="profile-field">Apellido: {{user.lastname}}</div>
-  <div class="profile-field">Edad: {{user.age}}</div>
-  <div class="profile-field">Email: {{user.email}}</div>
+  <div class="profile-field"><strong>Nombre: </strong>{{user.name}}</div>
+  <div class="profile-field"><strong>Apellido: </strong>{{user.lastname}}</div>
+  <div class="profile-field"><strong>Edad: </strong>{{user.age}}</div>
+  <div class="profile-field"><strong>Email: </strong>{{user.email}}</div>
 
   <form action="/logout" method="post">
     <button class="logout-button" type="submit">Cerrar sesión</button>
