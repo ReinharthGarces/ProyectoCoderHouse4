@@ -126,6 +126,11 @@ viewsRouter.get('/login', (req, res) => {
   return res.render('login', { title: 'ReinharthApp-Login', style: 'login.css' });
 });
 
+//Ruta para mostrar un faillogin
+viewsRouter.get('/faillogin', (req, res) => {
+  return res.render('faillogin', { title: 'ReinharthApp-FailLogin', style: 'faillogin.css' });
+});
+
 viewsRouter.get('/profile', (req, res) => {
   try {
     if (!req.user) {

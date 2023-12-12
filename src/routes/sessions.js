@@ -11,9 +11,9 @@ const usersController = new UsersController()
 sessionRouter.get('/', usersController.sessions.bind(usersController))
 sessionRouter.get('/allusers', usersController.getAllUsers.bind(usersController))
 sessionRouter.post('/register', passport.authenticate('register',
-  { failureRedirect:'/failregister', failureFlash: true }), usersController.register.bind(usersController))
+  { failureRedirect:'/failregister?error=user_dataError', failureFlash: true }), usersController.register.bind(usersController))
 sessionRouter.post('/login',  passport.authenticate('login',
-  { failureRedirect: '/faillogin', failureFlash: true}), usersController.login.bind(usersController))
+  { failureRedirect: '/faillogin?error=invalid_credentials', failureFlash: true}), usersController.login.bind(usersController))
 sessionRouter.post('/recovery_password', usersController.recoveryPassword.bind(usersController))
 sessionRouter.get('/restore_password/:token', usersController.restorePassword.bind(usersController))
 sessionRouter.post('/restore_password/:token', usersController.restorePassword.bind(usersController))
